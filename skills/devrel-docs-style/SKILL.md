@@ -1,6 +1,6 @@
 ---
 name: devrel-dev-docs-style
-description: Audit and report adherence to documentation standards
+description: Audit and report adherence to developer documentation standards
 activates_on: ["*.md", "*.mdx", "*.txt"]
 uses: []
 license: MIT
