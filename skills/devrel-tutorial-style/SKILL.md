@@ -82,9 +82,16 @@ Note that between "get started" and "next steps" sections:
 
 Invoke the `devrel-docs-style` skill.
 
+However, do not write the developer documentation style report to disk.
+Instead these results will be combined into the this report in the next step.
+
 ### 5 - Compile a report
 
 Use the following report format: See `./assets/dev-tutorial-report-template.md`
+
+Note that:
+- "documentation style summary" section should be the "summary" section from the developer documentation style report
+- "issues" section should intersperse the "issues" section from the developer documentation style report
 
 ## Related skills
 
