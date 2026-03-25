@@ -1,4 +1,4 @@
-# Sample prompts for the Developer Documentation skill
+# Sample prompts for the developer documentation style skill
 
 Sample prompts categorised based on user stories.
 See `./user-stories.md`.
