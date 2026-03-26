@@ -2,7 +2,7 @@
 name: devrel-docs-translate-diff
 description: Generate precise translation diffs for localised versions of dev docs when the canonical version is updated, rather than re-translating entire pages.
 activates_on: ["*.md", "*.mdx", "*.txt"]
-uses: ["devrel-docs-style"]
+uses: ["devrel-dev-docs-style"]
 license: MIT
 metadata:
   author: bguiz
