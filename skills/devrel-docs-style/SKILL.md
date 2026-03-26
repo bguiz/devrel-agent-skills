@@ -6,7 +6,7 @@ uses: []
 license: MIT
 metadata:
   author: bguiz, theletterf
-  version: "0.0.0"
+  version: "0.0.1"
 ---
 
 # Developer Documentation Style, Skill Guide
@@ -99,6 +99,11 @@ poor phrase choice (qualifier) -> preferred phrase 1/ preferred phrase 2 (qualif
 ### 6 - Compile a report
 
 Use the following report format: See `./assets/dev-docs-report-template.md`
+
+Save the report to `${PROJ_ROOT}/.devrel-skills-outputs/devrel-docs-style--report-${ISO_TS}.md`
+where `PROJ_ROOT` is the root directory of the the current project, and
+where `ISO_TS` is the current timestamp produced by running this shell command `date -u +"%Y%m%d-%H%M%S"`.
+For example `/path/to/proj/.devrel-skills-outputs/devrel-docs-style--report-20260326-132726.md`
 
 ## Related skills
 

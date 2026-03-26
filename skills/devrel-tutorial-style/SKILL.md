@@ -2,11 +2,11 @@
 name: devrel-dev-tutorial-style
 description: Audit and report adherence to developer tutorial standards
 activates_on: ["*.md", "*.mdx", "*.txt"]
-uses: ["devrel-docs-style"]
+uses: ["devrel-dev-docs-style"]
 license: MIT
 metadata:
   author: bguiz
-  version: "0.0.0"
+  version: "0.0.1"
 ---
 
 # Developer Tutorial Style, Skill Guide
@@ -34,13 +34,19 @@ Perform the following sequence
 These bullet points should each be H2 headings for each section.
 Their sub-bullet points describe what should be in each section.
 
+If this tutorial is part of a series, the "prerequisites" and "get started" sections
+may already be covered in the first tutorial within the series,
+and you may check for the items there instead.
+
 - (no heading)
   - Include a bullet point list of 3-5 items for "what we will learn"
 - Prerequisites
+  - (check if covered in first part of series)
   - Software or dev tools that are needed before proceeding
   - Commands to check if they exist, and are the correct version
   - Links to installation instructions
 - Get started
+  - (check if covered in first part of series)
   - Link to the accompanying code repo
   - Instructions to make a copy of the repo, e.g. git clone, at the starting point i relevant
 - (...title of instructions step N)
@@ -80,7 +86,7 @@ Note that between "get started" and "next steps" sections:
 
 ### 4 - Check adherence to dev docs style
 
-Invoke the `devrel-docs-style` skill.
+Invoke the `devrel-dev-docs-style` skill.
 
 However, do not write the developer documentation style report to disk.
 Instead these results will be combined into the this report in the next step.
@@ -93,14 +99,19 @@ Note that:
 - "documentation style summary" section should be the "summary" section from the developer documentation style report
 - "issues" section should intersperse the "issues" section from the developer documentation style report
 
+Save the report to `${PROJ_ROOT}/.devrel-skills-outputs/devrel-tutorial-style--report-${ISO_TS}.md`
+where `PROJ_ROOT` is the root directory of the the current project, and
+where `ISO_TS` is the current timestamp produced by running this shell command `date -u +"%Y%m%d-%H%M%S"`.
+For example `/path/to/proj/.devrel-skills-outputs/devrel-tutorial-style--report-20260326-132726.md`
+
 ## Related skills
 
-- devrel-docs-style
+- devrel-dev-docs-style
 
 If the above skills are not available, install them using:
 
 ```shell
-npx skills add bguiz/devrel-agent-skills --skill devrel-docs-style
+npx skills add bguiz/devrel-agent-skills --skill devrel-dev-docs-style
 ```
 
 ## Prerequisites
