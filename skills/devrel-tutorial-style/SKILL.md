@@ -34,10 +34,6 @@ Perform the following sequence
 These bullet points should each be H2 headings for each section.
 Their sub-bullet points describe what should be in each section.
 
-If this tutorial is part of a series, the "prerequisites" and "get started" sections
-may already be covered in the first tutorial within the series,
-and you may check for the items there instead.
-
 - (no heading)
   - Include a bullet point list of 3-5 items for "what we will learn"
 - Prerequisites
@@ -62,6 +58,11 @@ and you may check for the items there instead.
   - Include a bullet point list of 3-5 items for "what we have learnt", based on on "what we will learn" in intro with variations allowed
   - If this is a series, link to the next tutorial in the same series (chronological order)
   - If completing this tutorial imparts skills or knowledge that now "unlocks" other tutorials, link to those
+
+Note that for tutorials that are part of a series:
+- the "prerequisites" and "get started" sections
+  may already be covered in the first tutorial within the series.
+- you may check for the items there instead.
 
 Note that between "get started" and "next steps" sections:
 - there should be at least 3 instructions steps

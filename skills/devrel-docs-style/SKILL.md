@@ -6,7 +6,7 @@ uses: []
 license: MIT
 metadata:
   author: bguiz, theletterf
-  version: "0.0.1"
+  version: "0.0.2"
 ---
 
 # Developer Documentation Style, Skill Guide
@@ -96,7 +96,27 @@ poor phrase choice (qualifier) -> preferred phrase 1/ preferred phrase 2 (qualif
 - utilize -> use
 - see -> view/ look
 
-### 6 - Compile a report
+### 6 - Detect generative AI writing styles
+
+- Identify patterns
+  - Read the input text carefully
+  - Scan for the signs in `./references/gen-ai-writing-tells.md`
+- Suggest edits
+  - Use natural alternatives
+  - Preserve meaning, the core message remains intact
+  - Match the intended tone/ voice (formal, casual, technical, etc.)
+- 2nd pass:
+  - Think: "What makes the text seem AI generated?"
+  - Think: "How to make it not seem AI generated?"
+  - Update the list of suggested edits
+- 3rd pass:
+  - Think: "Does this sound natural when read aloud?"
+  - Think: "Does this use specific details, instead of vague claims?"
+  - Think: "Does the tone stay consistent throughout?"
+  - Think: "Does the language sound simple or or overly complex/ academic?"
+  - Update the list of suggested edits
+
+### 7 - Compile a report
 
 Use the following report format: See `./assets/dev-docs-report-template.md`
 
