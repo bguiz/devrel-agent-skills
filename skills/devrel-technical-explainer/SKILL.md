@@ -45,7 +45,7 @@ If the user has not provided any of these, ask them to:
 - (FIELD) -> What is the field that you are new to?
 - (CONCEPTS) -> Which specific concepts do you need help learning?
 - (ROLE) -> What is your current role/ profession?
-- (MATERIALS) -> Provide a copy of the materials that you need explained. (File path or text)
+- (MATERIALS) -> Provide a copy of the materials that you need explained. (File path, URL, or text)
 
 Check that the (CONCEPTS) are related to the (MATERIALS).
 If they are unrelated, tell the user so, then exit.
@@ -69,6 +69,7 @@ Go to step 3.
 
 - Identify 3 key items based on (CONCEPTS) + (MATERIALS); without considering your previous explanation.
 - Ask 3 multiple choice questions, all at once, to evaluate user's understanding
+  - Use format: `./references/mcq-template.md`
 - Await user's answers
 - Check if answers were correct
 - For each wrong answer:
@@ -78,9 +79,12 @@ Go to step 3.
 
 If any questions were answered incorrectly:
 - Give consideration to the gaps in user's understanding of (CONCEPTS)
-- Factor this in, and repeat step 2
+- Factor this in, and go back to step 2
 
-Otherwise, go to step 4
+Otherwise, go to step 4.
+
+Note that step 2 and step 3 should repeat in a loop,
+until user answers ALL 3 questions asked correctly.
 
 ### 4 - Wrap up
 
