@@ -6,7 +6,7 @@ uses: []
 license: MIT
 metadata:
   author: bguiz, theletterf
-  version: "0.0.2"
+  version: "0.0.3"
 ---
 
 # Developer Documentation Style, Skill Guide
@@ -29,14 +29,19 @@ Their associated sample prompts: `./references/sample-prompts.md`
 
 Perform the following sequence
 
-### 1 - Identify which files should be checked
+### 1 - Identify inputs
 
-- If this is a Github PR
-  - Check all files that have been added or modified in the PR
-  - Ignore any deleted files
-- If this skill is invoked manually
-  - Any input arguments (e.g. `${ARGS}`) should be considered as either file names or file path globs
-  - Check the explicitly specified files and files that match the glob
+- Which type of English should be used?
+  - Has the user specified the use of American English?
+  - Otherwise default to British English.
+  - Do *not* attempt to infer or guess this.
+- Which files should be checked?
+  - If this is a Github PR
+    - Check all files that have been added or modified in the PR
+    - Ignore any deleted files
+  - If this skill is invoked manually
+    - Any input arguments (e.g. `${ARGS}`) should be considered as either file names or file path globs
+    - Check the explicitly specified files and files that match the glob
 
 ### 2 - Review for voice and tone
 
@@ -49,9 +54,22 @@ Perform the following sequence
 - Informational tone - Be direct, neutral, and scannable. May use some friendly tones in tutorials.
 - Latin abbreviations - Permitted. "e.g." and "for example" are both OK.
 
-### 3 - Grammar and spelling
+### 3 - Spelling
 
-- British English - Use -ise/-yse verbs, -our nouns, -ence nouns, -ogue nouns (organise, colour, licence, dialogue).
+Based on the chosen type of English, do one of the following.
+
+#### British English
+
+- Identify any spelling errors
+- Use -ise/-yse verbs, -our nouns, -ence nouns, -ogue nouns (organise, colour, licence, dialogue).
+
+#### American English
+
+- Identify any spelling errors
+- Use -ize/-yze verbs, -or nouns, -ense nouns, -og nouns (organize, color, license, dialog).
+
+### 4 - Grammar
+
 - Oxford comma - Always use in lists of three or more.
 - Abbreviations - Spell out on first use. Pluralize without apostrophes (APIs, SDKs, OSes).
 - Capitalization - Sentence-style for headings. Capitalize proper nouns and product names only. Don't capitalize all words. Don't capitalize spelled-out acronyms unless proper nouns. Match UI capitalization.
@@ -59,7 +77,7 @@ Perform the following sequence
 - Gerunds - Use in top-level task titles. Use action verbs in lower-level titles. Avoid gerunds in prepositional phrases ("how to configure" not "on configuring").
 - Noun vs. verb compounds - backup/back up, login/log in, setup/set up, startup/start up.
 
-### 4 - Formatting
+### 5 - Formatting
 
 - Inline code - Use monospaced font. In markdown, use single backticks.
 - Multiline code - Use monospaced font in a dedicated code block. In markdown, use triple backticks and specify the language for syntax highlighting.
@@ -74,7 +92,7 @@ Perform the following sequence
 - Headings - Use H1, H2, H3, and H4 headings. Avoid H5, and H6 headings. In markdown, use an empty line after the heading.
 - Links - Avoid bare URLs. Avoid link text similar to "click here".
 
-### 5 - Word choice
+### 6 - Word choice
 
 Replace poor phrase choices with preferred phrase choices,
 in the list following this pattern:
@@ -96,7 +114,7 @@ poor phrase choice (qualifier) -> preferred phrase 1/ preferred phrase 2 (qualif
 - utilize -> use
 - see -> view/ look
 
-### 6 - Detect generative AI writing styles
+### 7 - Detect generative AI writing styles
 
 - Identify patterns
   - Read the input text carefully
@@ -116,7 +134,7 @@ poor phrase choice (qualifier) -> preferred phrase 1/ preferred phrase 2 (qualif
   - Think: "Does the language sound simple or or overly complex/ academic?"
   - Update the list of suggested edits
 
-### 7 - Compile a report
+### 8 - Compile a report
 
 Use the following report format: See `./assets/dev-docs-report-template.md`
 
