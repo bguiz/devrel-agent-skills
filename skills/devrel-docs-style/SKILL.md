@@ -43,7 +43,7 @@ Perform the following sequence
     - Any input arguments (e.g. `${ARGS}`) should be considered as either file names or file path globs
     - Check the explicitly specified files and files that match the glob
 
-### 2 - Review for voice and tone
+### 2 - Voice and tone
 
 - Active voice - Prefer active over passive.
 - Present tense - Write in present tense.
@@ -114,7 +114,7 @@ poor phrase choice (qualifier) -> preferred phrase 1/ preferred phrase 2 (qualif
 - utilize -> use
 - see -> view/ look
 
-### 7 - Detect generative AI writing styles
+### 7 - Generative AI writing styles
 
 - Identify patterns
   - Read the input text carefully
@@ -135,6 +135,17 @@ poor phrase choice (qualifier) -> preferred phrase 1/ preferred phrase 2 (qualif
   - Update the list of suggested edits
 
 ### 8 - Compile a report
+
+You now have a list of issues identified in the following categories:
+Voice and tone, spelling, grammar, formatting, word choice, generative AI writing tells.
+However, they are present in the order that they were discovered.
+Rearrange them:
+1. 1st: group all issues present in the same source file together
+2. 2nd: arrange the issues in order of line number (per source file)
+3. 3rd: merge issues the occur within same paragraph (same or adjacent line numbers) into a single issue
+   - Optionally, use multiple diffs within the same issue,
+     only if this aides with clarity;
+     otherwise default to a single diff.
 
 Use the following report format: See `./assets/dev-docs-report-template.md`
 

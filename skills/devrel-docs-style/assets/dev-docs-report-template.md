@@ -21,6 +21,8 @@
 + (... proposed replacement line)
 ```
 
+(... optional: insert more diffs)
+
 (... insert more issues)
 
 ## Reproducing this report
