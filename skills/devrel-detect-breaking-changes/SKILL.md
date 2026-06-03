@@ -4,7 +4,7 @@ description: Detect breaking changes in a git repo between two tagged releases. 
 license: MIT
 metadata:
   author: bguiz
-  version: "0.0.1"
+  version: "0.0.2"
 ---
 
 # Detect Breaking Changes, Skill Guide
@@ -28,7 +28,7 @@ For large output, e.g. for `git diff`, show the file name it is saved to instead
 Fail fast: If any step cannot complete, show the user a detailed error message.
 Exit immediately, do not attempt to try again or find a workaround.
 
-## 1 - Inputs
+### 1 - Inputs
 
 Obtain the following inputs:
 - `REPO` - GitHub repo URL
@@ -40,12 +40,12 @@ Obtain the following inputs:
 - `PROJ_ROOT` - the root of the current project
 - `OUT_FILES_PREFIX` - `${PROJ_ROOT}/.devrel-skills-outputs/devrel-detect-breaking-changes--${ISO_TS}--`
 
-## 2 - Repo check
+### 2 - Repo check
 
 - Clone the git repo
 - Check that both `PREV_TAG` and `NEXT_TAG` exist in the repo
 
-## 3 - Diff
+### 3 - Diff
 
 - Perform a git diff from `PREV_TAG` to `NEXT_TAG`
 - Save diff to `OUT_FILE_DIFF` - `${OUT_FILES_PREFIX}--diff-${PREV_TAG}-${NEXT_TAG}.diff`
@@ -56,7 +56,10 @@ git diff ${PREV_TAG}..${NEXT_TAG} > "${OUT_FILE_DIFF}" 2>&1 && \
 echo "Diff saved. $( wc -l < "${OUT_FILE_DIFF}" ) lines"
 ```
 
-## 4 - Detection
+### 4 - Detection
+
+Use a subagent for this step (separate context).
+Expose `OUT_FILE_DETECT` value to main agent.
 
 - Review `OUT_FILE_DIFF` to look for anything that is related to the following categories:
   - CLI changes
@@ -72,7 +75,10 @@ echo "Diff saved. $( wc -l < "${OUT_FILE_DIFF}" ) lines"
   - Use format: `./assets/detection-template.md`
   - File name: `OUT_FILE_DETECT` - `${OUT_FILES_PREFIX}--detection-${PREV_TAG}-${NEXT_TAG}.md`
 
-## 5 - Interactive analysis
+### 5 - Interactive analysis
+
+Use a subagent for this step (separate context).
+Expose items to main agent.
 
 - Review `OUT_FILE_DETECT`
   - Perform a holistic analysis of the items detected
@@ -91,9 +97,21 @@ echo "Diff saved. $( wc -l < "${OUT_FILE_DIFF}" ) lines"
   - impact - how it impacts the category, and how it impacts specific personas
   - impact level reason - why it the impact level was chosen
   - recommendations - 1 or more recommendations targeting `PERSONAS`
-- Write a analysis report
-  - Group by the above impact level
-    - Any item whose impact level is "not needed" should not be included in the report
+
+### 6 - Questions
+
+- Formulate questions for the developers/ maintainers of the analysed codebase
+  - For each question the main idea is to:
+    - Get confirmation if an item is indeed an issue, or can be ignored
+    - Clarify any assumptions made about the item
+    - Determine if the item has a narrower/wider scope than detected
+  - Collect a list of items that are related to this question (minimum 1)
+
+### 7 - Final report
+
+- Group by items identifies by their impact level
+  - Any item whose impact level is "not needed" should not be included in the report
+- Write an analysis report
   - Use format: `./assets/analysis-template.md`
   - File name: `OUT_FILE_ANALYSIS` - `${OUT_FILES_PREFIX}--analysis-${PREV_TAG}-${NEXT_TAG}.md`
 

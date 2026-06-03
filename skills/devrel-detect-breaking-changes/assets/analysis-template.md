@@ -10,6 +10,13 @@
   - (... glob or file path within repo)
   - (... more files or globs)
 
+## Questions
+
+- (...question for maintainers)
+  - (... optional more detail/ context)
+  - Related to: (... list of item names, comma separated)
+- (...more questions)
+
 ## Items by impact level
 
 ### (... impact level)
