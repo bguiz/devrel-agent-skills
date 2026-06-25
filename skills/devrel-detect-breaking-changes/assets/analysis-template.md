@@ -4,38 +4,38 @@
 
 - X total items found
 - Breakdown:
-  - (... impact level): N items
-  - (... more impact levels)
+  - (…impact level): N items
+  - (…more impact levels)
 - Files involved:
-  - (... glob or file path within repo)
-  - (... more files or globs)
+  - (…glob or file path within repo)
+  - (…more files or globs)
 
 ## Questions
 
-- (...question for maintainers)
-  - (... optional more detail/ context)
-  - Related to: (... list of item names, comma separated)
+- (…question for maintainers)
+  - (…optional more detail/ context)
+  - Related to: (…list of item names, comma separated)
 - (...more questions)
 
 ## Items by impact level
 
-### (... impact level)
+### (…impact level)
 
-#### (... item name) [(... item category)]
+#### (…item name) [(…item category)]
 
-(... description)
+(…description)
 
-(... impacts)
+(…impacts)
 
-(... impact level reason)
+(…impact level reason)
 
 Recommendations:
-- (... recommendation for item)
-- (... more recommendations)
+- (…recommendation for item)
+- (…more recommendations)
 
-(... insert more issues)
+(…insert more issues)
 
-(... insert more categories)
+(…insert more categories)
 
 ----
 

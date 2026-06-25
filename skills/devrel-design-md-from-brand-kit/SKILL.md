@@ -33,7 +33,7 @@ Do not proceed until you have this.
 ### 2 - Research
 
 - Refer to the formal specification for DESIGN.md here: https://raw.githubusercontent.com/google-labs-code/design.md/refs/heads/main/docs/spec.md
-- Refer to my company brand kit here: (... BRAND_KIT_URL)
+- Refer to my company brand kit here: (…BRAND_KIT_URL)
 
 ### 3 - Output
 

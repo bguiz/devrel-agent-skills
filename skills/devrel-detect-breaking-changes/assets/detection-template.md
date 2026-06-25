@@ -4,28 +4,28 @@
 
 - X total items found
 - Breakdown:
-  - (... category): N items
-  - (... more categories)
+  - (…category): N items
+  - (…more categories)
 - Files involved:
-  - (... glob or file path within repo)
-  - (... more files or globs)
+  - (…glob or file path within repo)
+  - (…more files or globs)
 
 ## Items by category
 
-### (... category)
+### (…category)
 
-(... describe item, and reason for inclusion/ relevance)
+(…describe item, and reason for inclusion/ relevance)
 
 ```diff
-- (... current line)
-+ (... proposed replacement line)
+- (…current line)
++ (…proposed replacement line)
 ```
 
-(... optional: insert more diffs)
+(…optional: insert more diffs)
 
-(... insert more issues)
+(…insert more issues)
 
-(... insert more categories)
+(…insert more categories)
 
 ----
 
