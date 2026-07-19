@@ -1,10 +1,10 @@
 ---
 name: devrel-extract-learnings
-description: After completing a complex task or building something across multiple chat threads, extract learnings for autodidactism, edification, and to enable repeat of similar tasks or builds.
+description: Extract learnings to enable repeat of similar tasks or builds, and for autodidactism, edification, after completing a complex task or building something across multiple chat threads.
 license: MIT
 metadata:
   author: bguiz
-  version: "0.0.0"
+  version: "0.0.1"
   activates_on: []
   uses: []
 ---
@@ -79,7 +79,7 @@ Create a new file LEARNINGS.md using format using format ./assets/learnings-temp
 and classify all raw learning into its sections:
 - "## Framework specific" -> any learning what applies more broadly when working with this ${FRAMEWORK}
 - "## Use case specific" -> any learning that was specific to ${BUILD}
-- "## Uncategorised" -> any learning that you are note > 80% sure of the category it belongs to, or if they belong to both
+- "## Uncategorised" -> any learning that you are not > 90% sure of the category it belongs to, or if they belong to both
 
 In each section, group learnings into logical groups with their own subsection.
 
