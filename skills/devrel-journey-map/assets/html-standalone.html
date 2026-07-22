@@ -11,18 +11,55 @@
       --ink: #050505;
       --paper: #f7f7f4;
       --paper-soft: #fbfbf8;
+      --control-surface: #ffffff;
       --rail: #bfc0c2;
       --rail-dark: #aeb0b3;
       --line: #050505;
       --drop: rgba(0, 0, 0, 0.055);
       --focus: #2b6ff3;
       --shadow: rgba(0, 0, 0, 0.11);
+      --texture-line: rgba(0, 0, 0, 0.018);
+      --canvas-bg-start: #ffffff;
+      --canvas-bg-end: #f7f7f4;
+      --stage-fill: #000000;
+      --stage-text: #ffffff;
+      --touchpoint-bg: #ffffff;
+      --touchpoint-likely-bg: #ffe2a6;
+      --touchpoint-best-bg: #cfe8ff;
+      --touchpoint-both-bg: #cdf2d4;
+      --touchpoint-flagged-ink: #050505;
+      --modal-backdrop: rgba(5, 5, 5, 0.42);
       --sans: "Avenir Next", "Trebuchet MS", "Gill Sans", "Segoe UI", sans-serif;
       --stage-row: 74px;
       --goal-row: 58px;
       --question-row: 162px;
       --internal-row: minmax(476px, auto);
       --external-row: minmax(244px, auto);
+    }
+
+    body[data-theme="dark"] {
+      color-scheme: dark;
+      --ink: #f4f1e8;
+      --paper: #111213;
+      --paper-soft: #232427;
+      --control-surface: #1b1c1f;
+      --rail: #4e5258;
+      --rail-dark: #34373d;
+      --line: #f4f1e8;
+      --drop: rgba(255, 255, 255, 0.08);
+      --focus: #8eb5ff;
+      --shadow: rgba(0, 0, 0, 0.36);
+      --texture-line: rgba(255, 255, 255, 0.035);
+      --canvas-bg-start: #191a1d;
+      --canvas-bg-end: #101113;
+      --stage-fill: #f4f1e8;
+      --stage-text: #050505;
+      --touchpoint-bg: #1f2023;
+      --touchpoint-likely-bg: #ffe2a6;
+      --touchpoint-best-bg: #cfe8ff;
+      --touchpoint-both-bg: #cdf2d4;
+      --touchpoint-flagged-ink: #050505;
+      --modal-backdrop: rgba(0, 0, 0, 0.66);
     }
 
     * {
@@ -52,8 +89,9 @@
       min-height: 100vh;
       padding: 18px 18px 40px;
       background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(247, 247, 244, 0.96)),
-        repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.018) 0 1px, transparent 1px 5px);
+        linear-gradient(180deg, color-mix(in srgb, var(--canvas-bg-start) 88%, transparent), color-mix(in srgb, var(--canvas-bg-end) 96%, transparent)),
+        repeating-linear-gradient(0deg, var(--texture-line) 0 1px, transparent 1px 5px);
+      transition: background 180ms ease, color 180ms ease;
     }
 
     .toolbar {
@@ -102,7 +140,7 @@
       padding: 4px 8px;
       border: 2px solid var(--line);
       border-radius: 7px;
-      background: #fff;
+      background: var(--control-surface);
       color: var(--ink);
       font: inherit;
       font-weight: 900;
@@ -120,7 +158,7 @@
     .control-button,
     .add-button {
       border: 2px solid var(--line);
-      background: #fff;
+      background: var(--control-surface);
       color: var(--ink);
       cursor: pointer;
       font-weight: 900;
@@ -138,9 +176,62 @@
 
     .control-button:hover,
     .add-button:hover {
-      background: #f1f1ef;
+      background: var(--paper-soft);
       transform: translateY(-1px);
       box-shadow: 0 3px 0 var(--line);
+    }
+
+    .theme-toggle {
+      display: inline-grid;
+      grid-template-columns: 28px 28px;
+      gap: 2px;
+      align-items: center;
+      min-height: 38px;
+      padding: 4px;
+      border: 2px solid var(--line);
+      border-radius: 999px;
+      background: var(--control-surface);
+      color: var(--ink);
+      cursor: pointer;
+      box-shadow: 0 2px 0 var(--line);
+      transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease;
+    }
+
+    .theme-toggle:hover {
+      background: var(--paper-soft);
+      transform: translateY(-1px);
+      box-shadow: 0 3px 0 var(--line);
+    }
+
+    .theme-toggle:active {
+      transform: translateY(1px);
+      box-shadow: 0 1px 0 var(--line);
+    }
+
+    .theme-icon {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 26px;
+      border-radius: 999px;
+      color: var(--ink);
+      opacity: 0.62;
+      transition: background 160ms ease, color 160ms ease, opacity 160ms ease;
+    }
+
+    .theme-icon svg {
+      width: 17px;
+      height: 17px;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      fill: none;
+    }
+
+    body:not([data-theme="dark"]) .theme-icon.sun,
+    body[data-theme="dark"] .theme-icon.moon {
+      background: var(--line);
+      color: var(--paper);
+      opacity: 1;
     }
 
     .control-button:active,
@@ -151,7 +242,7 @@
 
     .status {
       min-width: 118px;
-      color: #333;
+      color: color-mix(in srgb, var(--ink) 78%, var(--paper));
       font-size: 13px;
       font-weight: 800;
       text-align: right;
@@ -217,7 +308,8 @@
       padding: 8px 10px;
       border: 2px solid var(--line);
       border-radius: 8px;
-      background: #fff;
+      background: var(--control-surface);
+      color: var(--ink);
       font-size: 12px;
       font-weight: 900;
       line-height: 1;
@@ -296,8 +388,8 @@
       width: 100%;
       height: 72px;
       padding: 0 34px 1px 30px;
-      color: #fff;
-      background: #000;
+      color: var(--stage-text);
+      background: var(--stage-fill);
       clip-path: polygon(0 0, calc(100% - 48px) 0, 100% 50%, calc(100% - 48px) 100%, 0 100%);
       border-radius: 8px 0 0 8px;
       filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.1));
@@ -321,6 +413,13 @@
       font-weight: 500;
     }
 
+    .goal-list {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 5px;
+    }
+
     .question-cell {
       padding-top: 2px;
     }
@@ -337,6 +436,36 @@
 
     .question-cell li::marker {
       font-weight: 900;
+    }
+
+    .question-button {
+      display: inline;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      border-radius: 4px;
+      background: transparent;
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      line-height: inherit;
+      text-align: left;
+      white-space: pre-line;
+    }
+
+    .goal-cell .question-button {
+      font-weight: 500;
+    }
+
+    .question-button:hover {
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 3px;
+    }
+
+    .question-button:focus {
+      outline: 3px solid var(--focus);
+      outline-offset: 3px;
     }
 
     .journey-divider {
@@ -416,7 +545,7 @@
       padding: 8px 13px 7px;
       border: 1.8px solid var(--line);
       border-radius: 8px;
-      background: #fff;
+      background: var(--touchpoint-bg);
       color: var(--ink);
       box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
       cursor: grab;
@@ -433,6 +562,21 @@
       background: var(--paper-soft);
       box-shadow: 0 3px 9px var(--shadow);
       transform: translateY(-1px);
+    }
+
+    .touchpoint.is-likely {
+      background: var(--touchpoint-likely-bg);
+      color: var(--touchpoint-flagged-ink);
+    }
+
+    .touchpoint.is-best {
+      background: var(--touchpoint-best-bg);
+      color: var(--touchpoint-flagged-ink);
+    }
+
+    .touchpoint.is-best.is-likely {
+      background: var(--touchpoint-both-bg);
+      color: var(--touchpoint-flagged-ink);
     }
 
     .touchpoint:focus {
@@ -479,6 +623,11 @@
       resize: vertical;
     }
 
+    .touchpoint.is-best .touchpoint-editor,
+    .touchpoint.is-likely .touchpoint-editor {
+      color: var(--touchpoint-flagged-ink);
+    }
+
     .drop-marker {
       width: min(188px, 86%);
       height: 8px;
@@ -495,7 +644,7 @@
       }
 
       100% {
-        background: #fff;
+        background: var(--touchpoint-bg);
         box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
       }
     }
@@ -507,9 +656,79 @@
       }
 
       100% {
-        background: #fff;
+        background: var(--touchpoint-bg);
         box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
       }
+    }
+
+    .question-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: var(--modal-backdrop);
+    }
+
+    .question-modal-backdrop[hidden] {
+      display: none;
+    }
+
+    .question-modal {
+      position: relative;
+      width: min(640px, calc(100vw - 36px));
+      max-height: calc(100vh - 48px);
+      overflow: auto;
+      padding: 28px 30px 30px;
+      border: 3px solid var(--line);
+      border-radius: 8px;
+      background: var(--control-surface);
+      color: var(--ink);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+    }
+
+    .question-modal-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border: 2px solid var(--line);
+      border-radius: 50%;
+      background: var(--control-surface);
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 23px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .question-modal-kicker,
+    .question-modal-answer-label {
+      margin: 0;
+      font-size: 12px;
+      font-weight: 950;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .question-modal-question {
+      margin: 10px 42px 22px 0;
+      font-size: 28px;
+      font-weight: 950;
+      line-height: 1.08;
+      white-space: pre-line;
+    }
+
+    .question-modal-answer {
+      margin: 8px 0 0;
+      font-size: 19px;
+      font-weight: 600;
+      line-height: 1.35;
+      white-space: pre-line;
     }
 
     @media (max-width: 900px) {
@@ -560,6 +779,19 @@
         <button class="persona-value" id="personaValue" type="button" aria-label="Edit persona">Generic Developer</button>
       </h1>
       <div class="toolbar-actions">
+        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to dark mode" aria-pressed="false" title="Toggle dark/light mode">
+          <span class="theme-icon sun" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="4"></circle>
+              <path d="M12 2v3M12 19v3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M2 12h3M19 12h3M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12"></path>
+            </svg>
+          </span>
+          <span class="theme-icon moon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M21 14.7A7.8 7.8 0 0 1 9.3 3a8.6 8.6 0 1 0 11.7 11.7z"></path>
+            </svg>
+          </span>
+        </button>
         <button class="control-button" id="importButton" type="button">Import</button>
         <button class="control-button" id="exportButton" type="button">Export</button>
         <button class="control-button" id="downloadPngButton" type="button">Download PNG</button>
@@ -590,6 +822,16 @@
     </main>
   </div>
 
+  <div class="question-modal-backdrop" id="questionModal" hidden>
+    <section class="question-modal" role="dialog" aria-modal="true" aria-labelledby="questionModalQuestion" aria-describedby="questionModalAnswer" tabindex="-1">
+      <button class="question-modal-close" id="questionModalClose" type="button" aria-label="Close question answer">x</button>
+      <p class="question-modal-kicker" id="questionModalMeta">Question</p>
+      <h2 class="question-modal-question" id="questionModalQuestion"></h2>
+      <p class="question-modal-answer-label">Answer</p>
+      <p class="question-modal-answer" id="questionModalAnswer"></p>
+    </section>
+  </div>
+
   <script type="application/schema+json" id="journey-map-json-schema">
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -597,11 +839,11 @@
   "title": "Developer Journey Map State",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "persona", "nextTouchpointNumber", "touchpoints"],
+  "required": ["schemaVersion", "persona", "nextTouchpointNumber", "questions", "touchpoints"],
   "properties": {
     "schemaVersion": {
       "type": "integer",
-      "const": 1
+      "const": 2
     },
     "persona": {
       "type": "string",
@@ -611,6 +853,37 @@
     "nextTouchpointNumber": {
       "type": "integer",
       "minimum": 1
+    },
+    "questions": {
+      "type": "array",
+      "maxItems": 200,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["q", "a", "isGoal", "stage", "order"],
+        "properties": {
+          "q": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "a": {
+            "type": "string",
+            "maxLength": 4000
+          },
+          "isGoal": {
+            "type": "boolean"
+          },
+          "stage": {
+            "type": "string",
+            "enum": ["discover", "evaluate", "learn", "build", "scale"]
+          },
+          "order": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
     },
     "touchpoints": {
       "type": "array",
@@ -641,6 +914,12 @@
           "order": {
             "type": "integer",
             "minimum": 0
+          },
+          "best": {
+            "type": "boolean"
+          },
+          "likely": {
+            "type": "boolean"
           }
         }
       }
@@ -651,40 +930,65 @@
 
   <script type="application/json" id="default-journey-map-json">
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "persona": "Generic Developer",
   "nextTouchpointNumber": 1,
+  "questions": [
+    { "q": "Is this of use to me?", "a": "The developer is deciding whether the product is relevant enough to spend time evaluating.", "isGoal": true, "stage": "discover", "order": 0 },
+    { "q": "Will it meet my needs?", "a": "The developer is checking fit, feasibility, pricing, and likely risks before committing more attention.", "isGoal": true, "stage": "evaluate", "order": 0 },
+    { "q": "How does it work?", "a": "The developer is trying to understand the product model, developer workflow, and learning path.", "isGoal": true, "stage": "learn", "order": 0 },
+    { "q": "Can I build a proof\nof concept?", "a": "The developer wants enough confidence and support to build a small working implementation.", "isGoal": true, "stage": "build", "order": 0 },
+    { "q": "Can I build to scale?", "a": "The developer is assessing whether the product can support production growth, operations, and long-term adoption.", "isGoal": true, "stage": "scale", "order": 0 },
+    { "q": "What is it?", "a": "Explain the product clearly and quickly in the developer's own problem space.", "isGoal": false, "stage": "discover", "order": 0 },
+    { "q": "Could it solve\nmy problem?", "a": "Show the concrete problem categories, use cases, and constraints where the product is a strong fit.", "isGoal": false, "stage": "discover", "order": 1 },
+    { "q": "Is it credible?", "a": "Provide trust signals such as customers, examples, benchmarks, community activity, and transparent technical details.", "isGoal": false, "stage": "discover", "order": 2 },
+    { "q": "Does it look easy to use?", "a": "Make the initial path feel low-friction with clear docs, examples, and fast setup signals.", "isGoal": false, "stage": "evaluate", "order": 0 },
+    { "q": "Are there any red flags?", "a": "Address limitations, security, reliability, lock-in, maturity, and support expectations openly.", "isGoal": false, "stage": "evaluate", "order": 1 },
+    { "q": "Is pricing a barrier?", "a": "Help the developer understand free tiers, usage limits, cost drivers, and production pricing before they build.", "isGoal": false, "stage": "evaluate", "order": 2 },
+    { "q": "Time to 'Hello World'", "a": "Minimize the time from first visit to first successful run.", "isGoal": false, "stage": "learn", "order": 0 },
+    { "q": "Are the Docs a good\nexperience?", "a": "Docs should be complete, searchable, current, example-driven, and easy to navigate.", "isGoal": false, "stage": "learn", "order": 1 },
+    { "q": "Do I have confidence?", "a": "Give the developer confidence through working examples, clear concepts, error handling, and realistic implementation guidance.", "isGoal": false, "stage": "learn", "order": 2 },
+    { "q": "Is there a community?", "a": "Show where developers can learn from peers, ask questions, and see active ecosystem participation.", "isGoal": false, "stage": "learn", "order": 3 },
+    { "q": "Speed to MVP", "a": "Reduce the number of decisions and steps required to get a useful prototype running.", "isGoal": false, "stage": "build", "order": 0 },
+    { "q": "Is the product a good\nexperience?", "a": "The product should feel consistent, reliable, debuggable, and respectful of the developer's workflow.", "isGoal": false, "stage": "build", "order": 1 },
+    { "q": "How do I get support?", "a": "Make support routes, escalation paths, issue reporting, and response expectations visible.", "isGoal": false, "stage": "build", "order": 2 },
+    { "q": "Is it value for money?", "a": "Connect pricing to delivered capability, saved effort, and production value.", "isGoal": false, "stage": "build", "order": 3 },
+    { "q": "Can I do more?", "a": "Show advanced capabilities, extension points, and next-level implementation patterns.", "isGoal": false, "stage": "scale", "order": 0 },
+    { "q": "How do I give\nfeedback?", "a": "Provide clear feedback channels and show how feedback is triaged or acted on.", "isGoal": false, "stage": "scale", "order": 1 },
+    { "q": "How can I contribute?", "a": "Explain community contribution paths, ecosystem programs, content contributions, and code contribution options.", "isGoal": false, "stage": "scale", "order": 2 },
+    { "q": "Will the product grow\nwith me?", "a": "Demonstrate roadmap clarity, scalability, reliability, backwards compatibility, and long-term product direction.", "isGoal": false, "stage": "scale", "order": 3 }
+  ],
   "touchpoints": [
-    { "id": "tp-default-1", "section": "internal", "stage": "discover", "text": "Dev Hub\nLanding Page", "order": 0 },
-    { "id": "tp-default-2", "section": "internal", "stage": "discover", "text": "SEO / PPC", "order": 1 },
+    { "id": "tp-default-1", "section": "internal", "stage": "discover", "text": "Dev Hub\nLanding Page", "order": 0, "best": true },
+    { "id": "tp-default-2", "section": "internal", "stage": "discover", "text": "SEO / PPC", "order": 1, "likely": true },
     { "id": "tp-default-3", "section": "internal", "stage": "discover", "text": "Social", "order": 2 },
     { "id": "tp-default-4", "section": "internal", "stage": "discover", "text": "Events", "order": 3 },
     { "id": "tp-default-5", "section": "internal", "stage": "discover", "text": "Blog", "order": 4 },
     { "id": "tp-default-6", "section": "internal", "stage": "discover", "text": "Newsletter", "order": 5 },
     { "id": "tp-default-7", "section": "internal", "stage": "discover", "text": "Case Studies", "order": 6 },
-    { "id": "tp-default-8", "section": "internal", "stage": "evaluate", "text": "Docs\nLanding Page", "order": 0 },
+    { "id": "tp-default-8", "section": "internal", "stage": "evaluate", "text": "Docs\nLanding Page", "order": 0, "best": true },
     { "id": "tp-default-9", "section": "internal", "stage": "evaluate", "text": "FAQs", "order": 1 },
     { "id": "tp-default-10", "section": "internal", "stage": "evaluate", "text": "Product pages", "order": 2 },
     { "id": "tp-default-11", "section": "internal", "stage": "evaluate", "text": "Forums", "order": 3 },
     { "id": "tp-default-12", "section": "internal", "stage": "evaluate", "text": "Use Cases", "order": 4 },
     { "id": "tp-default-13", "section": "internal", "stage": "evaluate", "text": "Pricing Page", "order": 5 },
     { "id": "tp-default-14", "section": "internal", "stage": "evaluate", "text": "Webinars", "order": 6 },
-    { "id": "tp-default-15", "section": "internal", "stage": "learn", "text": "Getting Started/\nQuick Start Guide", "order": 0 },
-    { "id": "tp-default-16", "section": "internal", "stage": "learn", "text": "Code Samples", "order": 1 },
+    { "id": "tp-default-15", "section": "internal", "stage": "learn", "text": "Getting Started/\nQuick Start Guide", "order": 0, "best": true },
+    { "id": "tp-default-16", "section": "internal", "stage": "learn", "text": "Code Samples", "order": 1, "likely": true },
     { "id": "tp-default-17", "section": "internal", "stage": "learn", "text": "Tutorials", "order": 2 },
     { "id": "tp-default-18", "section": "internal", "stage": "learn", "text": "Sign up / Registration", "order": 3 },
     { "id": "tp-default-19", "section": "internal", "stage": "learn", "text": "Office Hours", "order": 4 },
     { "id": "tp-default-20", "section": "internal", "stage": "learn", "text": "Training", "order": 5 },
     { "id": "tp-default-21", "section": "internal", "stage": "learn", "text": "Learning Resources", "order": 6 },
     { "id": "tp-default-22", "section": "internal", "stage": "build", "text": "Extensions", "order": 0 },
-    { "id": "tp-default-23", "section": "internal", "stage": "build", "text": "Sandbox", "order": 1 },
-    { "id": "tp-default-24", "section": "internal", "stage": "build", "text": "Reference Guide", "order": 2 },
+    { "id": "tp-default-23", "section": "internal", "stage": "build", "text": "Sandbox", "order": 1, "likely": true },
+    { "id": "tp-default-24", "section": "internal", "stage": "build", "text": "Reference Guide", "order": 2, "best": true },
     { "id": "tp-default-25", "section": "internal", "stage": "build", "text": "Changelog", "order": 3 },
     { "id": "tp-default-26", "section": "internal", "stage": "build", "text": "Support", "order": 4 },
     { "id": "tp-default-27", "section": "internal", "stage": "build", "text": "Workshops", "order": 5 },
-    { "id": "tp-default-28", "section": "internal", "stage": "scale", "text": "Developer Success", "order": 0 },
+    { "id": "tp-default-28", "section": "internal", "stage": "scale", "text": "Developer Success", "order": 0, "best": true },
     { "id": "tp-default-29", "section": "internal", "stage": "scale", "text": "SLAs", "order": 1 },
-    { "id": "tp-default-30", "section": "internal", "stage": "scale", "text": "Product Roadmap", "order": 2 },
+    { "id": "tp-default-30", "section": "internal", "stage": "scale", "text": "Product Roadmap", "order": 2, "likely": true },
     { "id": "tp-default-31", "section": "internal", "stage": "scale", "text": "Showcase", "order": 3 },
     { "id": "tp-default-32", "section": "internal", "stage": "scale", "text": "Ambassador Program", "order": 4 },
     { "id": "tp-default-33", "section": "internal", "stage": "scale", "text": "Partner Program", "order": 5 },
@@ -694,7 +998,7 @@
     { "id": "tp-default-37", "section": "external", "stage": "discover", "text": "Event, Meetups, Hackathons", "order": 2 },
     { "id": "tp-default-38", "section": "external", "stage": "discover", "text": "Referals", "order": 3 },
     { "id": "tp-default-39", "section": "external", "stage": "discover", "text": "Online & Offline Groups", "order": 4 },
-    { "id": "tp-default-40", "section": "external", "stage": "evaluate", "text": "GitHub", "order": 0 },
+    { "id": "tp-default-40", "section": "external", "stage": "evaluate", "text": "GitHub", "order": 0, "likely": true },
     { "id": "tp-default-41", "section": "external", "stage": "evaluate", "text": "Stack Overflow", "order": 1 },
     { "id": "tp-default-42", "section": "external", "stage": "learn", "text": "Technology\nDependencies", "order": 0 }
   ]
@@ -706,60 +1010,13 @@
       "use strict";
 
       const STORAGE_KEY = "developerJourneyMap.v1";
+      const THEME_STORAGE_KEY = "developerJourneyMap.theme.v1";
       const STAGES = [
-        {
-          id: "discover",
-          label: "Discover",
-          goal: "Is this of use to me?",
-          questions: [
-            "What is it?",
-            "Could it solve\nmy problem?",
-            "Is it credible?"
-          ]
-        },
-        {
-          id: "evaluate",
-          label: "Evaluate",
-          goal: "Will it meet my needs?",
-          questions: [
-            "Does it look easy to use?",
-            "Are there any red flags?",
-            "Is pricing a barrier?"
-          ]
-        },
-        {
-          id: "learn",
-          label: "Learn",
-          goal: "How does it work?",
-          questions: [
-            "Time to 'Hello World'",
-            "Are the Docs a good\nexperience?",
-            "Do I have confidence?",
-            "Is there a community?"
-          ]
-        },
-        {
-          id: "build",
-          label: "Build",
-          goal: "Can I build a proof\nof concept?",
-          questions: [
-            "Speed to MVP",
-            "Is the product a good\nexperience?",
-            "How do I get support?",
-            "Is it value for money?"
-          ]
-        },
-        {
-          id: "scale",
-          label: "Scale",
-          goal: "Can I build to scale?",
-          questions: [
-            "Can I do more?",
-            "How do I give\nfeedback?",
-            "How can I contribute?",
-            "Will the product grow\nwith me?"
-          ]
-        }
+        { id: "discover", label: "Discover" },
+        { id: "evaluate", label: "Evaluate" },
+        { id: "learn", label: "Learn" },
+        { id: "build", label: "Build" },
+        { id: "scale", label: "Scale" }
       ];
 
       const SECTION_IDS = ["internal", "external"];
@@ -769,6 +1026,7 @@
 
       const mapGrid = document.getElementById("mapGrid");
       const statusEl = document.getElementById("status");
+      const themeToggle = document.getElementById("themeToggle");
       const personaValue = document.getElementById("personaValue");
       const importButton = document.getElementById("importButton");
       const exportButton = document.getElementById("exportButton");
@@ -777,6 +1035,12 @@
       const importFile = document.getElementById("importFile");
       const addInternalButton = document.getElementById("addInternalButton");
       const addExternalButton = document.getElementById("addExternalButton");
+      const questionModal = document.getElementById("questionModal");
+      const questionModalDialog = questionModal.querySelector(".question-modal");
+      const questionModalClose = document.getElementById("questionModalClose");
+      const questionModalMeta = document.getElementById("questionModalMeta");
+      const questionModalQuestion = document.getElementById("questionModalQuestion");
+      const questionModalAnswer = document.getElementById("questionModalAnswer");
 
       let state = null;
       let draggedId = null;
@@ -784,13 +1048,16 @@
       let statusTimer = null;
       let flashTouchpointId = null;
       let flashTouchpointKind = null;
+      let lastQuestionTrigger = null;
 
       window.DEVELOPER_JOURNEY_MAP_SCHEMA = schema;
       window.getDeveloperJourneyMapData = () => cloneState(state);
 
+      applyTheme(loadTheme());
       renderStaticRows();
       state = loadState();
       renderPersona();
+      renderQuestionRows();
       renderTouchpoints();
       attachChromeEvents();
       saveState("Ready");
@@ -810,20 +1077,14 @@
           goalCell.className = "goal-cell";
           goalCell.style.gridColumn = column;
           goalCell.style.gridRow = "2";
-          goalCell.textContent = stage.goal;
+          goalCell.dataset.stage = stage.id;
           mapGrid.appendChild(goalCell);
 
           const questionCell = document.createElement("div");
           questionCell.className = "question-cell";
           questionCell.style.gridColumn = column;
           questionCell.style.gridRow = "3";
-          const list = document.createElement("ol");
-          stage.questions.forEach((question) => {
-            const item = document.createElement("li");
-            item.textContent = question;
-            list.appendChild(item);
-          });
-          questionCell.appendChild(list);
+          questionCell.dataset.stage = stage.id;
           mapGrid.appendChild(questionCell);
 
           SECTION_IDS.forEach((section) => {
@@ -842,7 +1103,53 @@
         });
       }
 
+      function renderQuestionRows() {
+        STAGES.forEach((stage) => {
+          const goalCell = document.querySelector(`.goal-cell[data-stage="${stage.id}"]`);
+          const questionCell = document.querySelector(`.question-cell[data-stage="${stage.id}"]`);
+          if (!goalCell || !questionCell) {
+            return;
+          }
+
+          goalCell.replaceChildren();
+          const goalList = document.createElement("div");
+          goalList.className = "goal-list";
+          getQuestions(true, stage.id).forEach((question) => {
+            goalList.appendChild(createQuestionButton(question));
+          });
+          goalCell.appendChild(goalList);
+
+          questionCell.replaceChildren();
+          const list = document.createElement("ol");
+          getQuestions(false, stage.id).forEach((question) => {
+            const item = document.createElement("li");
+            item.appendChild(createQuestionButton(question));
+            list.appendChild(item);
+          });
+          questionCell.appendChild(list);
+        });
+      }
+
+      function getQuestions(isGoal, stage) {
+        return state.questions
+          .filter((question) => question.isGoal === isGoal && question.stage === stage)
+          .sort((a, b) => a.order - b.order || a.q.localeCompare(b.q));
+      }
+
+      function createQuestionButton(question) {
+        const button = document.createElement("button");
+        button.className = "question-button";
+        button.type = "button";
+        button.textContent = question.q;
+        button.dataset.stage = question.stage;
+        button.dataset.isGoal = String(question.isGoal);
+        button.setAttribute("aria-label", `Open answer: ${question.q.replace(/\s+/g, " ")}`);
+        button.addEventListener("click", () => openQuestionModal(question, button));
+        return button;
+      }
+
       function attachChromeEvents() {
+        themeToggle.addEventListener("click", toggleTheme);
         personaValue.addEventListener("click", startEditingPersona);
         addInternalButton.addEventListener("click", () => addTouchpoint("internal"));
         addExternalButton.addEventListener("click", () => addTouchpoint("external"));
@@ -860,6 +1167,67 @@
 
         document.addEventListener("dragover", handleDocumentDragOver, true);
         document.addEventListener("drop", handleDocumentDrop, true);
+        questionModal.addEventListener("click", (event) => {
+          if (event.target === questionModal) {
+            closeQuestionModal();
+          }
+        });
+        questionModalClose.addEventListener("click", closeQuestionModal);
+        document.addEventListener("keydown", (event) => {
+          if (event.key === "Escape" && !questionModal.hidden) {
+            closeQuestionModal();
+          }
+        });
+      }
+
+      function loadTheme() {
+        try {
+          return window.localStorage.getItem(THEME_STORAGE_KEY) === "dark" ? "dark" : "light";
+        } catch (error) {
+          return "light";
+        }
+      }
+
+      function toggleTheme() {
+        const nextTheme = document.body.dataset.theme === "dark" ? "light" : "dark";
+        applyTheme(nextTheme);
+        try {
+          window.localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+        } catch (error) {
+          setStatus("Storage blocked");
+        }
+      }
+
+      function applyTheme(theme) {
+        const normalizedTheme = theme === "dark" ? "dark" : "light";
+        document.body.dataset.theme = normalizedTheme;
+        themeToggle.setAttribute("aria-pressed", String(normalizedTheme === "dark"));
+        themeToggle.setAttribute("aria-label", normalizedTheme === "dark" ? "Switch to light mode" : "Switch to dark mode");
+      }
+
+      function openQuestionModal(question, trigger) {
+        lastQuestionTrigger = trigger || document.activeElement;
+        const stageLabel = getStageLabel(question.stage);
+        questionModalMeta.textContent = `${stageLabel} / ${question.isGoal ? "Goal" : "Question"}`;
+        questionModalQuestion.textContent = question.q;
+        questionModalAnswer.textContent = question.a || "No answer provided.";
+        questionModal.hidden = false;
+        document.body.classList.add("modal-open");
+        window.requestAnimationFrame(() => questionModalDialog.focus());
+      }
+
+      function closeQuestionModal() {
+        questionModal.hidden = true;
+        document.body.classList.remove("modal-open");
+        if (lastQuestionTrigger && typeof lastQuestionTrigger.focus === "function") {
+          lastQuestionTrigger.focus();
+        }
+        lastQuestionTrigger = null;
+      }
+
+      function getStageLabel(stageId) {
+        const stage = STAGES.find((candidate) => candidate.id === stageId);
+        return stage ? stage.label : stageId;
       }
 
       function renderPersona() {
@@ -914,15 +1282,15 @@
         }
 
         if (errors.length === 0) {
-          const allowedRootKeys = ["schemaVersion", "persona", "nextTouchpointNumber", "touchpoints"];
+          const allowedRootKeys = ["schemaVersion", "persona", "nextTouchpointNumber", "questions", "touchpoints"];
           const unknownKey = Object.keys(input).find((key) => !allowedRootKeys.includes(key));
           if (unknownKey) {
             errors.push(`Root has unsupported key "${unknownKey}".`);
           }
         }
 
-        if (errors.length === 0 && input.schemaVersion !== 1) {
-          errors.push("schemaVersion must be 1.");
+        if (errors.length === 0 && input.schemaVersion !== 2) {
+          errors.push("schemaVersion must be 2.");
         }
 
         if (errors.length === 0 && (typeof input.persona !== "string" || input.persona.trim().length === 0 || input.persona.length > 120)) {
@@ -933,21 +1301,68 @@
           errors.push("nextTouchpointNumber must be a positive integer.");
         }
 
+        const questionSource = input && Array.isArray(input.questions) ? input.questions : cloneState(DEFAULT_STATE.questions);
+        if (errors.length === 0 && input.questions !== undefined && (!Array.isArray(input.questions) || input.questions.length > 200)) {
+          errors.push("questions must be an array with 200 items or fewer.");
+        }
+
         if (errors.length === 0 && (!Array.isArray(input.touchpoints) || input.touchpoints.length > 500)) {
           errors.push("touchpoints must be an array with 500 items or fewer.");
         }
 
         const ids = new Set();
+        const normalizedQuestions = [];
         const normalizedTouchpoints = [];
 
         if (errors.length === 0) {
+          questionSource.forEach((question, index) => {
+            if (!question || typeof question !== "object" || Array.isArray(question)) {
+              errors.push(`questions[${index}] must be an object.`);
+              return;
+            }
+
+            const allowedKeys = ["q", "a", "isGoal", "stage", "order"];
+            const unknownKey = Object.keys(question).find((key) => !allowedKeys.includes(key));
+            if (unknownKey) {
+              errors.push(`questions[${index}] has unsupported key "${unknownKey}".`);
+            }
+
+            if (typeof question.q !== "string" || question.q.trim().length === 0 || question.q.length > 300) {
+              errors.push(`questions[${index}].q must be 1 to 300 characters.`);
+            }
+
+            if (typeof question.a !== "string" || question.a.length > 4000) {
+              errors.push(`questions[${index}].a must be a string with 4000 characters or fewer.`);
+            }
+
+            if (typeof question.isGoal !== "boolean") {
+              errors.push(`questions[${index}].isGoal must be a boolean.`);
+            }
+
+            if (!STAGE_IDS.includes(question.stage)) {
+              errors.push(`questions[${index}].stage is not a known stage.`);
+            }
+
+            if (!Number.isInteger(question.order) || question.order < 0) {
+              errors.push(`questions[${index}].order must be a non-negative integer.`);
+            }
+
+            normalizedQuestions.push({
+              q: String(question.q || "").trim().replace(/\r\n/g, "\n"),
+              a: String(question.a || "").trim().replace(/\r\n/g, "\n"),
+              isGoal: Boolean(question.isGoal),
+              stage: question.stage,
+              order: Number(question.order)
+            });
+          });
+
           input.touchpoints.forEach((touchpoint, index) => {
             if (!touchpoint || typeof touchpoint !== "object" || Array.isArray(touchpoint)) {
               errors.push(`touchpoints[${index}] must be an object.`);
               return;
             }
 
-            const allowedKeys = ["id", "section", "stage", "text", "order"];
+            const allowedKeys = ["id", "section", "stage", "text", "order", "best", "likely"];
             const unknownKey = Object.keys(touchpoint).find((key) => !allowedKeys.includes(key));
             if (unknownKey) {
               errors.push(`touchpoints[${index}] has unsupported key "${unknownKey}".`);
@@ -977,13 +1392,31 @@
               errors.push(`touchpoints[${index}].order must be a non-negative integer.`);
             }
 
-            normalizedTouchpoints.push({
+            if (touchpoint.best !== undefined && typeof touchpoint.best !== "boolean") {
+              errors.push(`touchpoints[${index}].best must be a boolean when present.`);
+            }
+
+            if (touchpoint.likely !== undefined && typeof touchpoint.likely !== "boolean") {
+              errors.push(`touchpoints[${index}].likely must be a boolean when present.`);
+            }
+
+            const normalizedTouchpoint = {
               id: String(touchpoint.id),
               section: touchpoint.section,
               stage: touchpoint.stage,
               text: String(touchpoint.text).trim(),
               order: Number(touchpoint.order)
-            });
+            };
+
+            if (touchpoint.best === true) {
+              normalizedTouchpoint.best = true;
+            }
+
+            if (touchpoint.likely === true) {
+              normalizedTouchpoint.likely = true;
+            }
+
+            normalizedTouchpoints.push(normalizedTouchpoint);
           });
         }
 
@@ -995,12 +1428,14 @@
         }
 
         const normalized = {
-          schemaVersion: 1,
+          schemaVersion: 2,
           persona: input.persona.trim(),
           nextTouchpointNumber: getNextTouchpointNumber(input.nextTouchpointNumber, normalizedTouchpoints),
+          questions: normalizedQuestions,
           touchpoints: normalizedTouchpoints
         };
 
+        normalizeQuestionOrders(normalized.questions);
         normalizeOrders(normalized.touchpoints);
 
         return {
@@ -1019,7 +1454,21 @@
       }
 
       function normalizeAllOrders() {
+        normalizeQuestionOrders(state.questions);
         normalizeOrders(state.touchpoints);
+      }
+
+      function normalizeQuestionOrders(questions) {
+        [true, false].forEach((isGoal) => {
+          STAGE_IDS.forEach((stage) => {
+            questions
+              .filter((question) => question.isGoal === isGoal && question.stage === stage)
+              .sort((a, b) => a.order - b.order || a.q.localeCompare(b.q))
+              .forEach((question, index) => {
+                question.order = index;
+              });
+          });
+        });
       }
 
       function normalizeOrders(touchpoints) {
@@ -1065,6 +1514,16 @@
         element.setAttribute("role", "button");
         element.setAttribute("aria-label", touchpoint.text.replace(/\s+/g, " "));
         element.textContent = touchpoint.text;
+
+        if (touchpoint.best) {
+          element.classList.add("is-best");
+          element.dataset.best = "true";
+        }
+
+        if (touchpoint.likely) {
+          element.classList.add("is-likely");
+          element.dataset.likely = "true";
+        }
 
         if (touchpoint.id === activeFlashId && activeFlashKind) {
           element.classList.add(`flash-${activeFlashKind}`);
@@ -1474,14 +1933,18 @@
         return canvas;
       }
 
+      function cssVar(name, fallback) {
+        return getComputedStyle(document.body).getPropertyValue(name).trim() || fallback;
+      }
+
       function drawPageBackground(context, width, height) {
         const gradient = context.createLinearGradient(0, 0, 0, height);
-        gradient.addColorStop(0, "#ffffff");
-        gradient.addColorStop(1, "#f7f7f4");
+        gradient.addColorStop(0, cssVar("--canvas-bg-start", "#ffffff"));
+        gradient.addColorStop(1, cssVar("--canvas-bg-end", "#f7f7f4"));
         context.fillStyle = gradient;
         context.fillRect(0, 0, width, height);
 
-        context.strokeStyle = "rgba(0, 0, 0, 0.018)";
+        context.strokeStyle = cssVar("--texture-line", "rgba(0, 0, 0, 0.018)");
         context.lineWidth = 1;
         for (let y = 0; y < height; y += 5) {
           context.beginPath();
@@ -1498,12 +1961,13 @@
           }
 
           const rect = bounds(button);
+          const style = getComputedStyle(button);
           drawRoundedRect(context, rect.x, rect.y + 2, rect.width, rect.height, 8, {
-            fill: "#050505"
+            fill: style.borderTopColor || cssVar("--line", "#050505")
           });
           drawRoundedRect(context, rect.x, rect.y, rect.width, rect.height, 8, {
-            fill: "#ffffff",
-            stroke: "#050505",
+            fill: style.backgroundColor || cssVar("--control-surface", "#ffffff"),
+            stroke: style.borderTopColor || cssVar("--line", "#050505"),
             lineWidth: 2
           });
         });
@@ -1512,11 +1976,11 @@
       function drawSideRail(context, bounds) {
         const rail = bounds(document.getElementById("deleteZone"));
         const gradient = context.createLinearGradient(rail.x, rail.y, rail.x + rail.width, rail.y);
-        gradient.addColorStop(0, "#bfc0c2");
-        gradient.addColorStop(1, "#aeb0b3");
+        gradient.addColorStop(0, cssVar("--rail", "#bfc0c2"));
+        gradient.addColorStop(1, cssVar("--rail-dark", "#aeb0b3"));
         drawRoundedRect(context, rail.x, rail.y, rail.width, rail.height, 10, {
           fill: gradient,
-          stroke: "#050505",
+          stroke: cssVar("--line", "#050505"),
           lineWidth: 3
         });
       }
@@ -1528,12 +1992,13 @@
           }
 
           const rect = bounds(button);
+          const style = getComputedStyle(button);
           drawRoundedRect(context, rect.x, rect.y + 2, rect.width, rect.height, rect.width / 2, {
-            fill: "#050505"
+            fill: style.borderTopColor || cssVar("--line", "#050505")
           });
           drawRoundedRect(context, rect.x, rect.y, rect.width, rect.height, rect.width / 2, {
-            fill: "#ffffff",
-            stroke: "#050505",
+            fill: style.backgroundColor || cssVar("--control-surface", "#ffffff"),
+            stroke: style.borderTopColor || cssVar("--line", "#050505"),
             lineWidth: 2
           });
         });
@@ -1543,8 +2008,9 @@
         document.querySelectorAll(".stage-pill").forEach((pill) => {
           const rect = bounds(pill);
           const notch = 48;
+          const style = getComputedStyle(pill);
           context.save();
-          context.fillStyle = "#000000";
+          context.fillStyle = style.backgroundColor || cssVar("--stage-fill", "#000000");
           context.beginPath();
           context.moveTo(rect.x + 8, rect.y);
           context.lineTo(rect.x + rect.width - notch, rect.y);
@@ -1576,7 +2042,8 @@
       function drawTouchpoints(context, bounds) {
         document.querySelectorAll(".touchpoint").forEach((touchpoint) => {
           const rect = bounds(touchpoint);
-          let fill = "#ffffff";
+          const style = getComputedStyle(touchpoint);
+          let fill = style.backgroundColor || cssVar("--touchpoint-bg", "#ffffff");
           if (touchpoint.classList.contains("flash-added")) {
             fill = "#d7ecff";
           } else if (touchpoint.classList.contains("flash-moved")) {
@@ -1585,7 +2052,7 @@
 
           drawRoundedRect(context, rect.x, rect.y, rect.width, rect.height, 8, {
             fill,
-            stroke: "#050505",
+            stroke: style.borderTopColor || cssVar("--line", "#050505"),
             lineWidth: 1.8
           });
         });
@@ -1595,7 +2062,7 @@
         const divider = bounds(document.querySelector(".journey-divider"));
         const y = divider.y + 12;
         context.save();
-        context.strokeStyle = "#050505";
+        context.strokeStyle = cssVar("--line", "#050505");
         context.lineWidth = 5;
         context.setLineDash([18, 10]);
         context.lineCap = "round";
@@ -1604,7 +2071,7 @@
         context.lineTo(width - 78, y);
         context.stroke();
         context.setLineDash([]);
-        context.fillStyle = "#050505";
+        context.fillStyle = cssVar("--line", "#050505");
         context.beginPath();
         context.moveTo(width - 50, y - 14);
         context.lineTo(width, y);
@@ -1945,6 +2412,7 @@
 
         state = result.value;
         renderPersona();
+        renderQuestionRows();
         saveState(message);
         renderTouchpoints();
       }

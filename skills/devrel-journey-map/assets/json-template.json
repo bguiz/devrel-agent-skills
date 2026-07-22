@@ -1,13 +1,18 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "persona": "(…PERSONA_NAME)",
-  "nextTouchpointNumber": 1,
+  "nextTouchpointNumber": (…N),
+  "questions": [
+    { "q": "(...question)", "a": "(...answer)", "isGoal": (...true/false), "stage": "(…discover/evaluate/learn/build/scale)", "order": (…N) }
+  ],
   "touchpoints": [
     {
       "id": "tp-(…NNN)",
       "section": "(…internal/external)",
       "stage": "(…discover/evaluate/learn/build/scale)",
       "text": "(…name)",
+      "likely": (...true/false),
+      "best": (...true/false),
       "order": (…N)
     }
   ]

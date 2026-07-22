@@ -13,9 +13,9 @@ metadata:
 
 Role: You are an expert developer relations practitioner, and focus on the developer success area of DevRel
 
-Context: You have a developer persona
+Context: You have a developer persona as a starting point
 
-Goal: Construct a developer journey map for a selected developer persona
+Goal: Interview user and construct a developer journey map for this developer persona
 
 ## Activities
 
@@ -73,7 +73,7 @@ The user is no longer role playing, and is back to being a DevRel.
 4. Record them in the "## Internal touchpoints" and "## External touchpoints" sections of OUTPUT_MD
 
 TOUCHPOINT_QUESTIONS:
-- "How important is (…TOUCHPOINT) to the developer? (Low/medium/high)"
+- "How important is (…TOUCHPOINT) to the developer? (Low/medium/high)" -> Higher importance have a lower order (so they are displayed at the top)
 - "Is (…TOUCHPOINT) controlled by you?" -> Classify into internal vs external touchpoints
 
 ### 4 - Validate
@@ -95,5 +95,6 @@ TOUCHPOINT_QUESTIONS:
 
 1. Generate JSON file that can be used to import -> OUTPUT_JSON - format with ./assets/json-template.json
     - Sanity check: File is valid parseable JSON
+    - Must assign one "likely" and "best" once each per stage, based on answers recorded in "## Validation"
 2. Scaffold HTML page -> `cp ./assets/html-standalone.html ${OUTPUT_HTML}`
 3. Update the "## Visual" section of OUTPUT_MD
