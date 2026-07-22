@@ -4,9 +4,9 @@ description: Constructs a developer journey map for a selected developer persona
 license: MIT
 metadata:
   author: bguiz
-  version: "0.0.0"
+  version: "0.0.1"
   activates_on: []
-  uses: ["devrel-persona"]
+  uses: []
 ---
 
 # Developer Journey Mapping
@@ -49,35 +49,51 @@ Create file OUTPUT_MD, leaving all fields empty at this stage, with format: ./as
 
 The user should role play as the developer with PERSONA_NAME persona in this steps.
 
-1. Ask the user (acting as persona) the all of the questions related to each stage of the developer journey, found in ./assets/goals-questions-by-stage.md
-2. If the user volunteers any additional questions and answers, include them too
+1. Reference ./assets/goals-questions-by-stage.md
+2. For each STAGE of the developer journey:
+    1. Ask the user (acting as persona) the all of the questions related to STAGE stage of the developer journey
+    2. If the user volunteers any additional questions and answers, include them too
 3. Record them in the "## Goals" section of OUTPUT_MD
 
 ### 3 - Touchpoints
 
 The user is no longer role playing, and is back to being a DevRel.
 
-1. For each QUESTION in each STAGE of the developer journey, found in ./assets/goals-questions-by-stage.md, ask:
-    - "What touchpoints would help a (…PERSONA_NAME) developer in the (…STAGE) stage use to answer (…QUESTION)?" -> TOUCHPOINTS
-    - For each TOUCHPOINT in TOUCHPOINTS:
-      - "How important is (…TOUCHPOINT) to the developer? (Low/medium/high)"
-      - "Is (…TOUCHPOINT) controlled by you?" -> Classify into internal vs external touchpoints
-2. If the user volunteers any additional questions and answers, include them too
-3. Record them in the "## Internal touchpoints" and "## External touchpoints" sections of OUTPUT_MD
+1. Reference ./assets/goals-questions-by-stage.md
+2. For each STAGE of the developer journey:
+    1. For each QUESTION in STAGE, ask:
+        - "What touchpoints would help a (…PERSONA_NAME) developer in the (…STAGE) stage use to answer (…QUESTION)?" + suggest relevant ones for ./assets/sample-touchpoints.md -> TOUCHPOINTS
+        - For each TOUCHPOINT in TOUCHPOINTS:
+          - ask TOUCHPOINT_QUESTIONS
+    2. If the user volunteers any additional questions and answers, include them too
+3. Review the "## Goals" section of OUTPUT_MD and extract any touchpoints that were mentioned in the answers -> MORE_TOUCHPOINTS
+    1. Skip all touchpoints already mentioned earlier
+    2. For each TOUCHPOINT in MORE_TOUCHPOINTS:
+        - "Is (…TOUCHPOINT) relevant to (…PERSONA_NAME)?" -> If user answers yes, ask TOUCHPOINT_QUESTIONS
+4. Record them in the "## Internal touchpoints" and "## External touchpoints" sections of OUTPUT_MD
+
+TOUCHPOINT_QUESTIONS:
+- "How important is (…TOUCHPOINT) to the developer? (Low/medium/high)"
+- "Is (…TOUCHPOINT) controlled by you?" -> Classify into internal vs external touchpoints
 
 ### 4 - Validate
 
-1. Ask the user the all of the questions in ./assets/validate.md
+1. Ask the user the all of the questions (drop the 'Q: ' prefix) in ./assets/validate-questions.md
+    - All about 1 stage at a time
+    - Ask about the best and most likely touchpoints 1st
+    - Then based on response ask the other questions for that stage
 2. Update OUTPUT_MD based on user responses
 3. Review OUTPUT_MD as a whole to identify:
-    - Gaps or missing items
-    - Contradictory items
-    - Miscategorised items (e.g. external touchpoint as internal touchpoint)
+    - Gaps or missing items -> Add missing items
+    - Contradictory items -> Resolve contradiction
+    - Miscategorised items (e.g. external touchpoint as internal touchpoint) -> Recategorise
+    - Duplicated items (e.g. tutorials appearing in both learn and build stages) -> Either keep in 1 stage and delete the others, or keep them but alter their names to differentiate
 4. Ask user to review OUTPUT_MD and edit/add any additional details as needed
 5. Wait for user to explicitly ask to proceed before continuing to next step
 
-### 6 - Visual
+### 5 - Visual
 
 1. Generate JSON file that can be used to import -> OUTPUT_JSON - format with ./assets/json-template.json
+    - Sanity check: File is valid parseable JSON
 2. Scaffold HTML page -> `cp ./assets/html-standalone.html ${OUTPUT_HTML}`
 3. Update the "## Visual" section of OUTPUT_MD
