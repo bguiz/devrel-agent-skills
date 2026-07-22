@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "persona": "(…PERSONA_NAME)",
+  "nextTouchpointNumber": 1,
+  "touchpoints": [
+    {
+      "id": "tp-(…NNN)",
+      "section": "(…internal/external)",
+      "stage": "(…discover/evaluate/learn/build/scale)",
+      "text": "(…name)",
+      "order": (…N)
+    }
+  ]
+}

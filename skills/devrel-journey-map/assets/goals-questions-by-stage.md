@@ -1,0 +1,28 @@
+- Discover
+  - Goal: Is this of use to me?
+  - What is it?
+  - Could it solve my problem?
+  - Is it credible?
+- Evaluate
+  - Goal: Will it meet my needs?
+  - Does it look easy to use?
+  - Are there any red flags?
+  - Is pricing a barrier?
+- Learn
+  - Goal: How does it work?
+  - Is time-to-hello-world reasonable?
+  - Are the docs a good experience?
+  - Do I have confidence?
+  - Is there a community?
+- Build
+  - Goal: Can I build a proof of concept?
+  - Is time to MVP reasonable?
+  - Is the product a good experience?
+  - How do I get support?
+  - Is it value for money?
+- Scale
+  - Goal: Can I scale my build?
+  - Can I do more?
+  - How do I give feedback?
+  - How can I contribute?
+  - Will the product grow with me?
