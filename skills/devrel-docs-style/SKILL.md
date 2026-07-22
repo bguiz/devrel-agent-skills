@@ -1,12 +1,12 @@
 ---
 name: devrel-dev-docs-style
 description: Audit and report adherence to developer documentation standards
-activates_on: ["*.md", "*.mdx", "*.txt"]
-uses: []
 license: MIT
 metadata:
   author: bguiz, theletterf
   version: "0.0.3"
+  activates_on: ["*.md", "*.mdx", "*.txt"]
+  uses: []
 ---
 
 # Developer Documentation Style, Skill Guide

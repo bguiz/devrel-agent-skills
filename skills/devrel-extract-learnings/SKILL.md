@@ -46,7 +46,7 @@ Validate: Able to access the prior chat threads (or file exports of them)
 
 For each CHAT in CHATS, run the following prompt in a subagent:
 
-```
+"""
 - Analyse chat thread ${CHAT} from this project
 - 80% focus on user messages, and 20% focus on AI responses
 - Identify the main things that were attempted
@@ -54,7 +54,7 @@ For each CHAT in CHATS, run the following prompt in a subagent:
   - Figure out: What was the user's tacit/ implicit knowledge here?
   - If tacit/ implicit knowledge unknown/ unclear, make a note of it in a sub-bullet, marking it with "[AMBIGUOUS]", adding any clarifying questions 
 - Write these findings to LEARNINGS_RAW.md using format ./assets/learnings-raw-template.md
-```
+"""
 
 In this step, do NOT ask the user any questions (that will come later).
 
@@ -63,11 +63,11 @@ In this step, do NOT ask the user any questions (that will come later).
 Extract all "[AMBIGUOUS]" points.
 For each AMBIGUOUS_ITEM, ask the user:
 
-```
+"""
 Ambiguous: ${AMBIGUOUS_ITEM}
 Pls state what implicit knowledge was important here.
 If needed, highlight anything adjacent/relevant.
-```
+"""
 
 After all clarifications, update LEARNINGS_RAW.md
 
@@ -87,11 +87,11 @@ In each section, group learnings into logical groups with their own subsection.
 
 - Output each item in "## Uncategorised" verbatim, with a comment/ reasoning about why it was put there.
 - For each, ask user:
-```
+"""
 Should this be move to framework or use case?
 Should this be rephrased or modified?
 Does this make you think of any new points that should be added?
-```
+"""
 
 When you have answers to ALL of them, update LEARNINGS.md
 
@@ -99,8 +99,8 @@ When you have answers to ALL of them, update LEARNINGS.md
 
 Substitute filenames with their absolute paths, and tell user:
 
-```
+"""
 Raw learnings have been extracted to: LEARNINGS_RAW.md
 and categorised and new learnings have been added to: LEARNINGS.md
-Please review them, and let me know if you would lik to make any changes (or edit them directly).
-```
+Please review them, and let me know if you would like to make any changes (or edit them directly).
+"""

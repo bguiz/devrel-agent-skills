@@ -1,12 +1,12 @@
 ---
 name: devrel-dev-tutorial-style
 description: Audit and report adherence to developer tutorial standards
-activates_on: ["*.md", "*.mdx", "*.txt"]
-uses: ["devrel-dev-docs-style"]
 license: MIT
 metadata:
   author: bguiz
   version: "0.0.1"
+  activates_on: ["*.md", "*.mdx", "*.txt"]
+  uses: ["devrel-dev-docs-style"]
 ---
 
 # Developer Tutorial Style, Skill Guide
