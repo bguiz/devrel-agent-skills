@@ -28,13 +28,16 @@
       --touchpoint-best-bg: #cfe8ff;
       --touchpoint-both-bg: #cdf2d4;
       --touchpoint-flagged-ink: #050505;
+      --connection: #1d5cff;
+      --connection-active: #0a9f74;
       --modal-backdrop: rgba(5, 5, 5, 0.42);
       --sans: "Avenir Next", "Trebuchet MS", "Gill Sans", "Segoe UI", sans-serif;
       --stage-row: 74px;
-      --goal-row: 58px;
-      --question-row: 162px;
+      --goal-row: minmax(86px, auto);
+      --question-row: minmax(162px, auto);
       --internal-row: minmax(476px, auto);
       --external-row: minmax(244px, auto);
+      --route-right-padding: 90px;
     }
 
     body[data-theme="dark"] {
@@ -59,6 +62,8 @@
       --touchpoint-best-bg: #cfe8ff;
       --touchpoint-both-bg: #cdf2d4;
       --touchpoint-flagged-ink: #050505;
+      --connection: #8eb5ff;
+      --connection-active: #80e8c2;
       --modal-backdrop: rgba(0, 0, 0, 0.66);
     }
 
@@ -99,7 +104,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 18px;
-      max-width: 1680px;
+      max-width: 1920px;
       margin: 0 auto 14px;
     }
 
@@ -153,6 +158,13 @@
       justify-content: flex-end;
       gap: 10px;
       flex-wrap: wrap;
+    }
+
+    .toolbar-label {
+      color: color-mix(in srgb, var(--ink) 82%, var(--paper));
+      font-size: 13px;
+      font-weight: 900;
+      text-transform: lowercase;
     }
 
     .control-button,
@@ -249,10 +261,17 @@
       text-transform: uppercase;
     }
 
-    body.is-rendering-png .toolbar-actions,
-    body.is-rendering-png .add-button,
-    body.is-rendering-png .status {
+    body.is-rendering-export .toolbar-actions {
+      display: none;
+    }
+
+    body.is-rendering-export .add-button,
+    body.is-rendering-export .status {
       visibility: hidden;
+    }
+
+    body.is-rendering-export .map-info {
+      display: none;
     }
 
     .visually-hidden {
@@ -277,13 +296,13 @@
       display: grid;
       grid-template-columns: 210px repeat(5, minmax(190px, 1fr));
       grid-template-rows: var(--stage-row) var(--goal-row) var(--question-row) var(--internal-row) var(--external-row);
-      column-gap: 30px;
+      column-gap: 60px;
       row-gap: 18px;
       align-items: start;
-      min-width: 1580px;
-      max-width: 1680px;
+      min-width: 1820px;
+      max-width: 1920px;
       margin: 0 auto;
-      padding: 0;
+      padding: 0 var(--route-right-padding) 0 0;
     }
 
     .side-rail {
@@ -297,33 +316,6 @@
       border-radius: 10px;
       background: linear-gradient(90deg, var(--rail), var(--rail-dark));
       box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
-    }
-
-    .delete-hint {
-      position: sticky;
-      top: 18px;
-      margin: 18px auto 0;
-      width: fit-content;
-      max-width: 150px;
-      padding: 8px 10px;
-      border: 2px solid var(--line);
-      border-radius: 8px;
-      background: var(--control-surface);
-      color: var(--ink);
-      font-size: 12px;
-      font-weight: 900;
-      line-height: 1;
-      text-align: center;
-      text-transform: uppercase;
-      opacity: 0;
-      transform: translateY(-6px);
-      transition: opacity 140ms ease, transform 140ms ease;
-      pointer-events: none;
-    }
-
-    body.is-dragging .delete-hint {
-      opacity: 1;
-      transform: translateY(0);
     }
 
     body.delete-active .side-rail {
@@ -344,13 +336,38 @@
       text-transform: uppercase;
     }
 
-    .stage-label,
+    .stage-label {
+      align-self: center;
+    }
+
+    .goals-label,
+    .questions-label {
+      display: flex;
+      align-items: stretch;
+      gap: 8px;
+      flex-direction: column;
+    }
+
+    .goals-label > span,
+    .questions-label > span,
+    .internal-label > span,
+    .external-label > span {
+      order: 1;
+    }
+
+    .goals-label > .add-button,
+    .questions-label > .add-button,
+    .internal-label > .add-button,
+    .external-label > .add-button {
+      order: 2;
+    }
+
     .goals-label {
       align-self: center;
     }
 
     .questions-label {
-      padding-top: 22px;
+      padding-top: 14px;
     }
 
     .internal-label {
@@ -380,6 +397,39 @@
       line-height: 1;
     }
 
+    .add-button-plus {
+      display: block;
+      transform: translateY(-1px);
+    }
+
+    .add-button-trash {
+      display: none;
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2.4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    .add-button.is-delete-button .add-button-plus {
+      display: none;
+    }
+
+    .add-button.is-delete-button .add-button-trash {
+      display: block;
+    }
+
+    .add-button.is-delete-button {
+      background: var(--paper-soft);
+    }
+
+    body.delete-active .add-button.is-delete-button {
+      outline: 3px solid var(--focus);
+      outline-offset: 3px;
+    }
+
     .stage-pill {
       position: relative;
       z-index: 2;
@@ -403,9 +453,13 @@
     .question-cell {
       position: relative;
       z-index: 2;
+      min-height: 40px;
+      border: 1px solid transparent;
+      border-radius: 9px;
       font-size: 21px;
       line-height: 1.12;
       white-space: pre-line;
+      transition: background 120ms ease, border-color 120ms ease;
     }
 
     .goal-cell {
@@ -446,11 +500,12 @@
       border-radius: 4px;
       background: transparent;
       color: var(--ink);
-      cursor: pointer;
+      cursor: grab;
       font: inherit;
       line-height: inherit;
       text-align: left;
       white-space: pre-line;
+      user-select: none;
     }
 
     .goal-cell .question-button {
@@ -461,6 +516,20 @@
       text-decoration: underline;
       text-decoration-thickness: 2px;
       text-underline-offset: 3px;
+    }
+
+    .question-button:active {
+      cursor: grabbing;
+    }
+
+    .question-button.dragging {
+      opacity: 0.35;
+    }
+
+    .goal-cell.drag-over,
+    .question-cell.drag-over {
+      border-color: rgba(0, 0, 0, 0.14);
+      background: var(--drop);
     }
 
     .question-button:focus {
@@ -537,13 +606,21 @@
       border-radius: 8px;
     }
 
+    .touch-cell:has(.touchpoint.editing) {
+      z-index: 8;
+    }
+
     .touchpoint {
+      --touchpoint-border-width: 1.8px;
+      --touchpoint-control-size: 30px;
+      --touchpoint-control-edge-offset: calc(-15px - var(--touchpoint-border-width));
+      position: relative;
       display: block;
       max-width: 100%;
       width: fit-content;
       min-height: 36px;
       padding: 8px 13px 7px;
-      border: 1.8px solid var(--line);
+      border: var(--touchpoint-border-width) solid var(--line);
       border-radius: 8px;
       background: var(--touchpoint-bg);
       color: var(--ink);
@@ -602,9 +679,56 @@
     }
 
     .touchpoint.editing {
+      display: block;
       min-width: 168px;
       cursor: text;
       user-select: text;
+      z-index: 9;
+    }
+
+    .touchpoint-flag-buttons {
+      position: absolute;
+      top: 50%;
+      left: var(--touchpoint-control-edge-offset);
+      z-index: 2;
+      display: inline-flex;
+      flex-direction: column;
+      gap: 6px;
+      transform: translateY(-50%);
+    }
+
+    .touchpoint-flag-button,
+    .touchpoint-connect-button {
+      position: relative;
+      flex: 0 0 auto;
+      display: inline-grid;
+      place-items: center;
+      width: var(--touchpoint-control-size);
+      height: var(--touchpoint-control-size);
+      border: 2px solid var(--line);
+      border-radius: 50%;
+      background: color-mix(in srgb, var(--rail) 62%, var(--control-surface));
+      color: var(--ink);
+      cursor: pointer;
+      box-shadow: 0 2px 0 var(--line);
+    }
+
+    .touchpoint-flag-button {
+      font-size: 17px;
+      font-weight: 950;
+      line-height: 1;
+    }
+
+    .touchpoint-flag-button.is-active {
+      color: var(--touchpoint-flagged-ink);
+    }
+
+    .touchpoint-flag-button.likely-flag.is-active {
+      background: var(--touchpoint-likely-bg);
+    }
+
+    .touchpoint-flag-button.best-flag.is-active {
+      background: var(--touchpoint-best-bg);
     }
 
     .touchpoint-editor {
@@ -628,6 +752,106 @@
       color: var(--touchpoint-flagged-ink);
     }
 
+    .touchpoint-connect-button {
+      position: absolute;
+      top: 50%;
+      right: var(--touchpoint-control-edge-offset);
+      z-index: 2;
+      transform: translateY(-50%);
+      background: var(--control-surface);
+      cursor: crosshair;
+    }
+
+    .touchpoint-connect-button::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-top: 3px solid currentColor;
+      border-right: 3px solid currentColor;
+      transform: rotate(45deg);
+      margin-left: -3px;
+    }
+
+    .touchpoint-flag-button:hover,
+    .touchpoint-flag-button:focus {
+      background: color-mix(in srgb, var(--rail) 62%, var(--control-surface));
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .touchpoint-connect-button:hover,
+    .touchpoint-connect-button:focus {
+      background: var(--paper-soft);
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .touchpoint-flag-button.likely-flag.is-active:hover,
+    .touchpoint-flag-button.likely-flag.is-active:focus {
+      background: var(--touchpoint-likely-bg);
+    }
+
+    .touchpoint-flag-button.best-flag.is-active:hover,
+    .touchpoint-flag-button.best-flag.is-active:focus {
+      background: var(--touchpoint-best-bg);
+    }
+
+    body.connection-mode .touchpoint {
+      cursor: crosshair;
+    }
+
+    .connection-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 7;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      pointer-events: none;
+    }
+
+    .connection-path {
+      fill: none;
+      stroke: var(--connection);
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity: 0.5;
+      marker-end: url(#connectionArrowHead);
+      pointer-events: none;
+      transition: opacity 120ms ease, stroke-width 120ms ease;
+    }
+
+    .connection-path.is-active {
+      stroke: var(--connection-active);
+      stroke-width: 4;
+      opacity: 0.5;
+      marker-end: url(#connectionArrowHeadActive);
+    }
+
+    #connectionPaths .connection-path {
+      cursor: pointer;
+      pointer-events: stroke;
+    }
+
+    #connectionPaths .connection-path:hover {
+      stroke-width: 4.5;
+      opacity: 1;
+      marker-end: url(#connectionArrowHeadHover);
+    }
+
+    #connectionArrowHead path {
+      fill: var(--connection);
+    }
+
+    #connectionArrowHeadHover path {
+      fill: var(--connection);
+    }
+
+    #connectionArrowHeadActive path {
+      fill: var(--connection-active);
+    }
+
     .drop-marker {
       width: min(188px, 86%);
       height: 8px;
@@ -635,6 +859,12 @@
       border-radius: 999px;
       background: #000;
       opacity: 0.78;
+    }
+
+    .question-drop-marker {
+      list-style: none;
+      width: min(180px, 86%);
+      margin: 3px 0;
     }
 
     @keyframes flash-added {
@@ -731,6 +961,74 @@
       white-space: pre-line;
     }
 
+    .question-modal-field {
+      display: block;
+      width: 100%;
+      border: 2px solid transparent;
+      border-radius: 7px;
+      background: color-mix(in srgb, var(--paper-soft) 82%, transparent);
+      color: var(--ink);
+      resize: vertical;
+      transition: border-color 120ms ease, background 120ms ease;
+    }
+
+    .question-modal-field:hover,
+    .question-modal-field:focus {
+      border-color: var(--line);
+      background: var(--paper-soft);
+      outline: 0;
+    }
+
+    textarea.question-modal-question {
+      min-height: 74px;
+      padding: 8px 10px;
+      font: inherit;
+      font-size: 28px;
+      font-weight: 950;
+      line-height: 1.08;
+    }
+
+    textarea.question-modal-answer {
+      min-height: 132px;
+      padding: 9px 10px;
+      font: inherit;
+      font-size: 19px;
+      font-weight: 600;
+      line-height: 1.35;
+    }
+
+    .map-info {
+      max-width: 1920px;
+      margin: 22px auto 0;
+      padding: 16px 0 0 210px;
+      border-top: 2px solid color-mix(in srgb, var(--line) 20%, transparent);
+      color: color-mix(in srgb, var(--ink) 74%, var(--paper));
+      font-size: 14px;
+      font-weight: 650;
+      line-height: 1.38;
+    }
+
+    .map-info ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .map-info li + li {
+      margin-top: 5px;
+    }
+
+    .map-info a {
+      color: inherit;
+      font-weight: 850;
+      text-decoration-thickness: 1.5px;
+      text-underline-offset: 3px;
+    }
+
+    .map-info code {
+      font-family: "SFMono-Regular", "Cascadia Code", Consolas, monospace;
+      font-size: 0.95em;
+    }
+
     @media (max-width: 900px) {
       .app-shell {
         padding: 14px 12px 28px;
@@ -748,6 +1046,21 @@
       .status {
         text-align: left;
       }
+
+      .map-info {
+        padding-left: 0;
+      }
+    }
+
+    .pdf-print-frame {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      width: 1px;
+      height: 1px;
+      border: 0;
+      opacity: 0;
+      pointer-events: none;
     }
 
     @media print {
@@ -757,6 +1070,10 @@
       }
 
       .toolbar {
+        display: none;
+      }
+
+      .map-info {
         display: none;
       }
 
@@ -792,10 +1109,14 @@
             </svg>
           </span>
         </button>
-        <button class="control-button" id="importButton" type="button">Import</button>
-        <button class="control-button" id="exportButton" type="button">Export</button>
-        <button class="control-button" id="downloadPngButton" type="button">Download PNG</button>
         <button class="control-button" id="resetButton" type="button">Reset</button>
+        <span class="toolbar-label">import:</span>
+        <button class="control-button" id="importButton" type="button">JSON</button>
+        <span class="toolbar-label">export:</span>
+        <button class="control-button" id="exportButton" type="button">JSON</button>
+        <button class="control-button" id="downloadPngButton" type="button">PNG</button>
+        <button class="control-button" id="downloadSvgButton" type="button">SVG</button>
+        <button class="control-button" id="downloadPdfButton" type="button">PDF</button>
         <input class="visually-hidden" id="importFile" type="file" accept=".json,application/json">
         <span class="status" id="status" role="status" aria-live="polite">Ready</span>
       </div>
@@ -803,32 +1124,96 @@
 
     <main class="map-viewport">
       <section class="map-grid" id="mapGrid" aria-label="Developer journey map">
-        <div class="side-rail delete-drop-target" id="deleteZone" aria-hidden="true">
-          <div class="delete-hint">Drop to delete</div>
-        </div>
+        <div class="side-rail delete-drop-target" id="deleteZone" aria-hidden="true"></div>
         <div class="side-label stage-label delete-drop-target" style="grid-row: 1;">Stage</div>
-        <div class="side-label goals-label delete-drop-target" style="grid-row: 2;">Goals/Needs</div>
-        <div class="side-label questions-label delete-drop-target" style="grid-row: 3;">Questions</div>
+        <div class="side-label goals-label delete-drop-target" style="grid-row: 2;">
+          <button class="add-button" id="addGoalButton" type="button" aria-label="Add goal question" title="Add goal question">
+            <span class="add-button-plus" aria-hidden="true">+</span>
+            <svg class="add-button-trash" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M3 6h18"></path>
+              <path d="M8 6V4h8v2"></path>
+              <path d="M6 6l1 15h10l1-15"></path>
+              <path d="M10 11v6"></path>
+              <path d="M14 11v6"></path>
+            </svg>
+          </button>
+          <span>Goals/Needs</span>
+        </div>
+        <div class="side-label questions-label delete-drop-target" style="grid-row: 3;">
+          <button class="add-button" id="addQuestionButton" type="button" aria-label="Add question" title="Add question">
+            <span class="add-button-plus" aria-hidden="true">+</span>
+            <svg class="add-button-trash" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M3 6h18"></path>
+              <path d="M8 6V4h8v2"></path>
+              <path d="M6 6l1 15h10l1-15"></path>
+              <path d="M10 11v6"></path>
+              <path d="M14 11v6"></path>
+            </svg>
+          </button>
+          <span>Questions</span>
+        </div>
         <div class="side-label internal-label delete-drop-target" style="grid-row: 4;">
-          <button class="add-button" id="addInternalButton" type="button" aria-label="Add internal touchpoint" title="Add internal touchpoint">+</button>
+          <button class="add-button" id="addInternalButton" type="button" aria-label="Add internal touchpoint" title="Add internal touchpoint">
+            <span class="add-button-plus" aria-hidden="true">+</span>
+            <svg class="add-button-trash" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M3 6h18"></path>
+              <path d="M8 6V4h8v2"></path>
+              <path d="M6 6l1 15h10l1-15"></path>
+              <path d="M10 11v6"></path>
+              <path d="M14 11v6"></path>
+            </svg>
+          </button>
           <span>Internal<br>Touchpoints</span>
         </div>
         <div class="side-label external-label delete-drop-target" style="grid-row: 5;">
-          <button class="add-button" id="addExternalButton" type="button" aria-label="Add external touchpoint" title="Add external touchpoint">+</button>
+          <button class="add-button" id="addExternalButton" type="button" aria-label="Add external touchpoint" title="Add external touchpoint">
+            <span class="add-button-plus" aria-hidden="true">+</span>
+            <svg class="add-button-trash" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M3 6h18"></path>
+              <path d="M8 6V4h8v2"></path>
+              <path d="M6 6l1 15h10l1-15"></path>
+              <path d="M10 11v6"></path>
+              <path d="M14 11v6"></path>
+            </svg>
+          </button>
           <span>External<br>Touchpoints</span>
         </div>
         <div class="journey-divider" aria-hidden="true"></div>
+        <svg class="connection-layer" id="connectionLayer" aria-hidden="true">
+          <defs>
+            <marker id="connectionArrowHead" viewBox="0 0 6 6" refX="0" refY="3" markerWidth="6" markerHeight="6" markerUnits="userSpaceOnUse" orient="auto">
+              <path d="M 0 0 L 6 3 L 0 6 z"></path>
+            </marker>
+            <marker id="connectionArrowHeadHover" viewBox="0 0 9 9" refX="0" refY="4.5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto">
+              <path d="M 0 0 L 9 4.5 L 0 9 z"></path>
+            </marker>
+            <marker id="connectionArrowHeadActive" viewBox="0 0 8 8" refX="0" refY="4" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto">
+              <path d="M 0 0 L 8 4 L 0 8 z"></path>
+            </marker>
+          </defs>
+          <g id="connectionPaths"></g>
+          <path class="connection-path is-active" id="activeConnectionPath" hidden></path>
+        </svg>
       </section>
     </main>
+
+    <footer class="map-info" id="mapInfo" aria-label="Developer journey map attribution">
+      <ul>
+        <li>Based on "Developer Relations", by Caroline Lewko and James Parton. <a href="https://www.devrel.agency/book" target="_blank" rel="noopener noreferrer">Buy the book</a>, I highly recommend it!</li>
+        <li>With inspiration from <a href="https://www.devrel.agency/post/mind-the-gap-dev-journey-tube-map" target="_blank" rel="noopener noreferrer">"Dev Journey Tube Map"</a> by Dana Fujikawa.</li>
+        <li>Created using <a href="https://github.com/bguiz/devrel-agent-skills/tree/main/skills/devrel-journey-map" target="_blank" rel="noopener noreferrer"><code>devrel-journey-map</code></a> agent skill, by Brendan Graetz.</li>
+      </ul>
+    </footer>
   </div>
 
   <div class="question-modal-backdrop" id="questionModal" hidden>
-    <section class="question-modal" role="dialog" aria-modal="true" aria-labelledby="questionModalQuestion" aria-describedby="questionModalAnswer" tabindex="-1">
+    <section class="question-modal" role="dialog" aria-modal="true" aria-labelledby="questionModalTitle" aria-describedby="questionModalDescription" tabindex="-1">
       <button class="question-modal-close" id="questionModalClose" type="button" aria-label="Close question answer">x</button>
-      <p class="question-modal-kicker" id="questionModalMeta">Question</p>
-      <h2 class="question-modal-question" id="questionModalQuestion"></h2>
+      <p class="question-modal-kicker" id="questionModalTitle">Question</p>
+      <p class="visually-hidden" id="questionModalDescription">Edit the selected journey question and answer.</p>
+      <textarea class="question-modal-question question-modal-field" id="questionModalQuestion" rows="2" maxlength="300" aria-label="Question text"></textarea>
       <p class="question-modal-answer-label">Answer</p>
-      <p class="question-modal-answer" id="questionModalAnswer"></p>
+      <textarea class="question-modal-answer question-modal-field" id="questionModalAnswer" rows="5" maxlength="4000" aria-label="Answer text"></textarea>
     </section>
   </div>
 
@@ -839,11 +1224,11 @@
   "title": "Developer Journey Map State",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "persona", "nextTouchpointNumber", "questions", "touchpoints"],
+  "required": ["schemaVersion", "persona", "nextTouchpointNumber", "questions", "touchpoints", "connections"],
   "properties": {
     "schemaVersion": {
       "type": "integer",
-      "const": 2
+      "const": 3
     },
     "persona": {
       "type": "string",
@@ -862,6 +1247,11 @@
         "additionalProperties": false,
         "required": ["q", "a", "isGoal", "stage", "order"],
         "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
           "q": {
             "type": "string",
             "minLength": 1,
@@ -923,6 +1313,40 @@
           }
         }
       }
+    },
+    "connections": {
+      "type": "array",
+      "maxItems": 500,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["from", "to"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "from": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "to": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "fromOrder": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "toOrder": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
     }
   }
 }
@@ -930,7 +1354,7 @@
 
   <script type="application/json" id="default-journey-map-json">
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "persona": "Generic Developer",
   "nextTouchpointNumber": 1,
   "questions": [
@@ -1001,7 +1425,8 @@
     { "id": "tp-default-40", "section": "external", "stage": "evaluate", "text": "GitHub", "order": 0, "likely": true },
     { "id": "tp-default-41", "section": "external", "stage": "evaluate", "text": "Stack Overflow", "order": 1 },
     { "id": "tp-default-42", "section": "external", "stage": "learn", "text": "Technology\nDependencies", "order": 0 }
-  ]
+  ],
+  "connections": []
 }
   </script>
 
@@ -1021,46 +1446,119 @@
 
       const SECTION_IDS = ["internal", "external"];
       const STAGE_IDS = STAGES.map((stage) => stage.id);
-      const schema = JSON.parse(document.getElementById("journey-map-json-schema").textContent);
-      const DEFAULT_STATE = JSON.parse(document.getElementById("default-journey-map-json").textContent);
+      const CONNECTION_LINE_WIDTH = 3;
+      const ACTIVE_CONNECTION_LINE_WIDTH = 4;
+      const CONNECTION_ARROW_LENGTH = 6;
+      const ACTIVE_CONNECTION_ARROW_LENGTH = 8;
+      const CONNECTION_EDGE_SPACING_MULTIPLIER = 2.25;
+      const CONNECTION_GUTTER_BEND = 44;
+      const CONNECTION_FINAL_STAGE_EXIT = 30;
+      const CONNECTION_UNDERPASS_PADDING = 26;
+      const CONNECTION_SAME_STAGE_LOOP = 78;
+      const PNG_EXPORT_SCALE = 3;
+      const schema = JSON.parse(requiredElement("journey-map-json-schema").textContent);
+      const DEFAULT_STATE = JSON.parse(requiredElement("default-journey-map-json").textContent);
 
-      const mapGrid = document.getElementById("mapGrid");
-      const statusEl = document.getElementById("status");
-      const themeToggle = document.getElementById("themeToggle");
-      const personaValue = document.getElementById("personaValue");
-      const importButton = document.getElementById("importButton");
-      const exportButton = document.getElementById("exportButton");
-      const downloadPngButton = document.getElementById("downloadPngButton");
-      const resetButton = document.getElementById("resetButton");
-      const importFile = document.getElementById("importFile");
-      const addInternalButton = document.getElementById("addInternalButton");
-      const addExternalButton = document.getElementById("addExternalButton");
-      const questionModal = document.getElementById("questionModal");
-      const questionModalDialog = questionModal.querySelector(".question-modal");
-      const questionModalClose = document.getElementById("questionModalClose");
-      const questionModalMeta = document.getElementById("questionModalMeta");
-      const questionModalQuestion = document.getElementById("questionModalQuestion");
-      const questionModalAnswer = document.getElementById("questionModalAnswer");
+      const appShell = requiredSelector(document, ".app-shell", "app shell");
+      const mapGrid = requiredElement("mapGrid");
+      const statusEl = requiredElement("status");
+      const themeToggle = requiredElement("themeToggle");
+      const personaValue = requiredElement("personaValue");
+      const importButton = requiredElement("importButton");
+      const exportButton = requiredElement("exportButton");
+      const downloadPngButton = requiredElement("downloadPngButton");
+      const downloadSvgButton = requiredElement("downloadSvgButton");
+      const downloadPdfButton = requiredElement("downloadPdfButton");
+      const resetButton = requiredElement("resetButton");
+      const importFile = requiredElement("importFile");
+      const addGoalButton = requiredElement("addGoalButton");
+      const addQuestionButton = requiredElement("addQuestionButton");
+      const addInternalButton = requiredElement("addInternalButton");
+      const addExternalButton = requiredElement("addExternalButton");
+      const connectionLayer = requiredElement("connectionLayer");
+      const connectionPaths = requiredElement("connectionPaths");
+      const activeConnectionPath = requiredElement("activeConnectionPath");
+      const questionModal = requiredElement("questionModal");
+      const questionModalDialog = requiredSelector(questionModal, ".question-modal", "question modal dialog");
+      const questionModalClose = requiredElement("questionModalClose");
+      const questionModalMeta = requiredElement("questionModalTitle");
+      const questionModalQuestion = requiredElement("questionModalQuestion");
+      const questionModalAnswer = requiredElement("questionModalAnswer");
+      const DELETE_ROW_BUTTONS = {
+        goals: addGoalButton,
+        questions: addQuestionButton,
+        internal: addInternalButton,
+        external: addExternalButton
+      };
 
       let state = null;
       let draggedId = null;
+      let draggedQuestionKey = null;
       let dropMarker = null;
+      let questionDropMarker = null;
       let statusTimer = null;
       let flashTouchpointId = null;
       let flashTouchpointKind = null;
       let lastQuestionTrigger = null;
+      let activeQuestion = null;
+      let connectionMode = null;
+      let shouldPersistInitialState = false;
+      let initialStatus = "Ready";
 
+      const testHooks = {
+        createExportArtifactSummary,
+        getLastExportSummary: () => window.__developerJourneyMapLastExport || null
+      };
+      const publicApi = {
+        schema,
+        getData: () => cloneState(state),
+        testHooks
+      };
+      const modules = Object.freeze({
+        lifecycle: Object.freeze({ init }),
+        state: Object.freeze({ loadState, saveState, validateState, getNormalizedStateSnapshot }),
+        rendering: Object.freeze({ renderStaticRows, renderQuestionRows, renderTouchpoints, renderConnections }),
+        connections: Object.freeze({ createConnection, updateConnection, editConnection }),
+        exports: Object.freeze({ createExportArtifactSummary, createExportArtifact, createPdfPrintArtifact })
+      });
+      window.DEVELOPER_JOURNEY_MAP = publicApi;
       window.DEVELOPER_JOURNEY_MAP_SCHEMA = schema;
-      window.getDeveloperJourneyMapData = () => cloneState(state);
+      window.getDeveloperJourneyMapData = publicApi.getData;
+      window.DEVELOPER_JOURNEY_MAP_TEST_HOOKS = testHooks;
 
-      applyTheme(loadTheme());
-      renderStaticRows();
-      state = loadState();
-      renderPersona();
-      renderQuestionRows();
-      renderTouchpoints();
-      attachChromeEvents();
-      saveState("Ready");
+      modules.lifecycle.init();
+
+      function init() {
+        applyTheme(loadTheme());
+        renderStaticRows();
+        state = loadState();
+        normalizeAllOrders();
+        renderPersona();
+        renderQuestionRows();
+        renderTouchpoints();
+        attachChromeEvents();
+        if (shouldPersistInitialState) {
+          saveState(initialStatus);
+        } else {
+          setStatus(initialStatus, { transient: false });
+        }
+      }
+
+      function requiredElement(id) {
+        const element = document.getElementById(id);
+        if (!element) {
+          throw new Error(`Missing required element #${id}.`);
+        }
+        return element;
+      }
+
+      function requiredSelector(root, selector, label) {
+        const element = root.querySelector(selector);
+        if (!element) {
+          throw new Error(`Missing required ${label || selector}.`);
+        }
+        return element;
+      }
 
       function renderStaticRows() {
         STAGES.forEach((stage, stageIndex) => {
@@ -1078,6 +1576,11 @@
           goalCell.style.gridColumn = column;
           goalCell.style.gridRow = "2";
           goalCell.dataset.stage = stage.id;
+          goalCell.dataset.isGoal = "true";
+          goalCell.setAttribute("aria-label", `goals for ${stage.label}`);
+          goalCell.addEventListener("dragover", handleQuestionCellDragOver);
+          goalCell.addEventListener("drop", handleQuestionCellDrop);
+          goalCell.addEventListener("dragleave", handleQuestionCellDragLeave);
           mapGrid.appendChild(goalCell);
 
           const questionCell = document.createElement("div");
@@ -1085,6 +1588,11 @@
           questionCell.style.gridColumn = column;
           questionCell.style.gridRow = "3";
           questionCell.dataset.stage = stage.id;
+          questionCell.dataset.isGoal = "false";
+          questionCell.setAttribute("aria-label", `questions for ${stage.label}`);
+          questionCell.addEventListener("dragover", handleQuestionCellDragOver);
+          questionCell.addEventListener("drop", handleQuestionCellDrop);
+          questionCell.addEventListener("dragleave", handleQuestionCellDragLeave);
           mapGrid.appendChild(questionCell);
 
           SECTION_IDS.forEach((section) => {
@@ -1140,44 +1648,162 @@
         const button = document.createElement("button");
         button.className = "question-button";
         button.type = "button";
+        button.draggable = true;
         button.textContent = question.q;
         button.dataset.stage = question.stage;
         button.dataset.isGoal = String(question.isGoal);
+        button.dataset.questionKey = getQuestionKey(question);
         button.setAttribute("aria-label", `Open answer: ${question.q.replace(/\s+/g, " ")}`);
-        button.addEventListener("click", () => openQuestionModal(question, button));
         return button;
+      }
+
+      function getQuestionKey(question) {
+        return question.id || `${question.isGoal ? "goal" : "question"}:${question.stage}:${question.order}`;
       }
 
       function attachChromeEvents() {
         themeToggle.addEventListener("click", toggleTheme);
         personaValue.addEventListener("click", startEditingPersona);
-        addInternalButton.addEventListener("click", () => addTouchpoint("internal"));
-        addExternalButton.addEventListener("click", () => addTouchpoint("external"));
+        addGoalButton.addEventListener("click", (event) => handleAddButtonClick(event, () => addQuestion(true)));
+        addQuestionButton.addEventListener("click", (event) => handleAddButtonClick(event, () => addQuestion(false)));
+        addInternalButton.addEventListener("click", (event) => handleAddButtonClick(event, () => addTouchpoint("internal")));
+        addExternalButton.addEventListener("click", (event) => handleAddButtonClick(event, () => addTouchpoint("external")));
         importButton.addEventListener("click", () => importFile.click());
         importFile.addEventListener("change", importFromFile);
         exportButton.addEventListener("click", exportToFile);
         downloadPngButton.addEventListener("click", downloadPng);
+        downloadSvgButton.addEventListener("click", downloadSvg);
+        downloadPdfButton.addEventListener("click", downloadPdf);
         resetButton.addEventListener("click", resetToDefault);
+        mapGrid.addEventListener("click", handleMapGridClick);
+        mapGrid.addEventListener("dblclick", handleMapGridDoubleClick);
+        mapGrid.addEventListener("keydown", handleMapGridKeyDown);
+        mapGrid.addEventListener("dragstart", handleMapGridDragStart);
+        mapGrid.addEventListener("dragend", handleMapGridDragEnd);
+        connectionPaths.addEventListener("dblclick", handleConnectionPathDoubleClick);
 
         document.querySelectorAll(".delete-drop-target").forEach((target) => {
           target.addEventListener("dragover", handleDeleteDragOver);
           target.addEventListener("drop", handleDeleteDrop);
           target.addEventListener("dragleave", handleDeleteDragLeave);
+          target.addEventListener("click", handleDeleteZoneClick);
         });
 
         document.addEventListener("dragover", handleDocumentDragOver, true);
         document.addEventListener("drop", handleDocumentDrop, true);
+        document.addEventListener("click", handleDocumentConnectionClick, true);
+        document.addEventListener("mousemove", handleConnectionMouseMove);
+        window.addEventListener("resize", renderConnections);
         questionModal.addEventListener("click", (event) => {
           if (event.target === questionModal) {
             closeQuestionModal();
           }
         });
         questionModalClose.addEventListener("click", closeQuestionModal);
+        questionModalQuestion.addEventListener("blur", () => saveQuestionModalEdits("Saved"));
+        questionModalAnswer.addEventListener("blur", () => saveQuestionModalEdits("Saved"));
+        questionModalQuestion.addEventListener("input", () => autoSizeEditor(questionModalQuestion));
+        questionModalAnswer.addEventListener("input", () => autoSizeEditor(questionModalAnswer));
+        questionModal.addEventListener("keydown", handleQuestionModalKeyDown);
         document.addEventListener("keydown", (event) => {
+          if (event.key === "Escape" && connectionMode) {
+            event.preventDefault();
+            exitConnectionMode();
+            return;
+          }
+
           if (event.key === "Escape" && !questionModal.hidden) {
             closeQuestionModal();
           }
         });
+      }
+
+      function handleMapGridClick(event) {
+        if (event.target.closest(".add-button")) {
+          return;
+        }
+
+        const questionButton = event.target.closest(".question-button");
+        if (questionButton && mapGrid.contains(questionButton)) {
+          const question = findQuestionByKey(questionButton.dataset.questionKey);
+          if (question) {
+            openQuestionModal(question, questionButton);
+          }
+          return;
+        }
+
+        const touchpoint = event.target.closest(".touchpoint");
+        if (touchpoint && mapGrid.contains(touchpoint)) {
+          handleTouchpointClick(event, touchpoint);
+        }
+      }
+
+      function handleMapGridDoubleClick(event) {
+        const touchpoint = event.target.closest(".touchpoint");
+        if (!touchpoint || !mapGrid.contains(touchpoint) || event.target.closest("button, textarea")) {
+          return;
+        }
+
+        startEditing(touchpoint, touchpoint.dataset.id);
+      }
+
+      function handleMapGridKeyDown(event) {
+        if (event.key !== "Enter") {
+          return;
+        }
+
+        const touchpoint = event.target.closest(".touchpoint");
+        if (!touchpoint || !mapGrid.contains(touchpoint)) {
+          return;
+        }
+
+        event.preventDefault();
+        startEditing(touchpoint, touchpoint.dataset.id);
+      }
+
+      function handleMapGridDragStart(event) {
+        const questionButton = event.target.closest(".question-button");
+        if (questionButton && mapGrid.contains(questionButton)) {
+          handleQuestionDragStart(event, questionButton);
+          return;
+        }
+
+        const touchpoint = event.target.closest(".touchpoint");
+        if (touchpoint && mapGrid.contains(touchpoint)) {
+          handleDragStart(event, touchpoint);
+        }
+      }
+
+      function handleMapGridDragEnd(event) {
+        if (event.target.closest(".question-button")) {
+          handleQuestionDragEnd();
+          return;
+        }
+
+        if (event.target.closest(".touchpoint")) {
+          handleDragEnd();
+        }
+      }
+
+      function handleConnectionPathDoubleClick(event) {
+        const path = event.target.closest(".connection-path");
+        if (!path || !connectionPaths.contains(path)) {
+          return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+        editConnection(path.dataset.connectionId || path.dataset.connectionIndex, event.clientX, event.clientY);
+      }
+
+      function handleAddButtonClick(event, action) {
+        if (connectionMode || hasActiveDrag()) {
+          event.preventDefault();
+          event.stopPropagation();
+          return;
+        }
+
+        action();
       }
 
       function loadTheme() {
@@ -1207,22 +1833,87 @@
 
       function openQuestionModal(question, trigger) {
         lastQuestionTrigger = trigger || document.activeElement;
+        activeQuestion = question;
         const stageLabel = getStageLabel(question.stage);
         questionModalMeta.textContent = `${stageLabel} / ${question.isGoal ? "Goal" : "Question"}`;
-        questionModalQuestion.textContent = question.q;
-        questionModalAnswer.textContent = question.a || "No answer provided.";
+        questionModalQuestion.value = question.q;
+        questionModalAnswer.value = question.a || "";
         questionModal.hidden = false;
+        appShell.inert = true;
         document.body.classList.add("modal-open");
-        window.requestAnimationFrame(() => questionModalDialog.focus());
+        window.requestAnimationFrame(() => {
+          autoSizeEditor(questionModalQuestion);
+          autoSizeEditor(questionModalAnswer);
+          questionModalQuestion.focus();
+          questionModalQuestion.select();
+        });
       }
 
       function closeQuestionModal() {
+        saveQuestionModalEdits("Saved");
         questionModal.hidden = true;
+        appShell.inert = false;
         document.body.classList.remove("modal-open");
         if (lastQuestionTrigger && typeof lastQuestionTrigger.focus === "function") {
           lastQuestionTrigger.focus();
         }
         lastQuestionTrigger = null;
+        activeQuestion = null;
+      }
+
+      function saveQuestionModalEdits(message) {
+        if (!activeQuestion) {
+          return;
+        }
+
+        const nextQuestion = questionModalQuestion.value.trim().replace(/\r\n/g, "\n") || "Placeholder question?";
+        const nextAnswer = questionModalAnswer.value.trim().replace(/\r\n/g, "\n");
+        if (activeQuestion.q === nextQuestion && activeQuestion.a === nextAnswer) {
+          return;
+        }
+
+        activeQuestion.q = nextQuestion;
+        activeQuestion.a = nextAnswer;
+        saveState(message || "Saved");
+        renderQuestionRows();
+      }
+
+      function handleQuestionModalKeyDown(event) {
+        if (questionModal.hidden) {
+          return;
+        }
+
+        if (event.key === "Escape") {
+          event.preventDefault();
+          closeQuestionModal();
+          return;
+        }
+
+        if (event.key !== "Tab") {
+          return;
+        }
+
+        const focusable = getModalFocusableElements();
+        if (focusable.length === 0) {
+          event.preventDefault();
+          questionModalDialog.focus();
+          return;
+        }
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+
+      function getModalFocusableElements() {
+        return Array.from(questionModal.querySelectorAll("button, textarea, [href], input, select, [tabindex]:not([tabindex='-1'])"))
+          .filter((element) => !element.disabled && isElementRenderable(element));
       }
 
       function getStageLabel(stageId) {
@@ -1238,6 +1929,7 @@
       function loadState() {
         const raw = readLocalStorage();
         if (!raw) {
+          shouldPersistInitialState = true;
           return cloneState(DEFAULT_STATE);
         }
 
@@ -1247,10 +1939,12 @@
           if (result.valid) {
             return result.value;
           }
-          setStatus("Storage reset");
+          shouldPersistInitialState = true;
+          initialStatus = "Storage reset";
           return cloneState(DEFAULT_STATE);
         } catch (error) {
-          setStatus("Storage reset");
+          shouldPersistInitialState = true;
+          initialStatus = "Storage reset";
           return cloneState(DEFAULT_STATE);
         }
       }
@@ -1282,15 +1976,19 @@
         }
 
         if (errors.length === 0) {
-          const allowedRootKeys = ["schemaVersion", "persona", "nextTouchpointNumber", "questions", "touchpoints"];
+          input = migrateState(input);
+        }
+
+        if (errors.length === 0) {
+          const allowedRootKeys = ["schemaVersion", "persona", "nextTouchpointNumber", "questions", "touchpoints", "connections"];
           const unknownKey = Object.keys(input).find((key) => !allowedRootKeys.includes(key));
           if (unknownKey) {
             errors.push(`Root has unsupported key "${unknownKey}".`);
           }
         }
 
-        if (errors.length === 0 && input.schemaVersion !== 2) {
-          errors.push("schemaVersion must be 2.");
+        if (errors.length === 0 && input.schemaVersion !== 3) {
+          errors.push("schemaVersion must be 3.");
         }
 
         if (errors.length === 0 && (typeof input.persona !== "string" || input.persona.trim().length === 0 || input.persona.length > 120)) {
@@ -1301,8 +1999,7 @@
           errors.push("nextTouchpointNumber must be a positive integer.");
         }
 
-        const questionSource = input && Array.isArray(input.questions) ? input.questions : cloneState(DEFAULT_STATE.questions);
-        if (errors.length === 0 && input.questions !== undefined && (!Array.isArray(input.questions) || input.questions.length > 200)) {
+        if (errors.length === 0 && (!Array.isArray(input.questions) || input.questions.length > 200)) {
           errors.push("questions must be an array with 200 items or fewer.");
         }
 
@@ -1310,21 +2007,39 @@
           errors.push("touchpoints must be an array with 500 items or fewer.");
         }
 
+        if (errors.length === 0 && (!Array.isArray(input.connections) || input.connections.length > 500)) {
+          errors.push("connections must be an array with 500 items or fewer.");
+        }
+
         const ids = new Set();
+        const questionIds = new Set();
+        const connectionIds = new Set();
+        const connectionPairs = new Set();
         const normalizedQuestions = [];
         const normalizedTouchpoints = [];
+        const normalizedConnections = [];
 
         if (errors.length === 0) {
-          questionSource.forEach((question, index) => {
+          input.questions.forEach((question, index) => {
             if (!question || typeof question !== "object" || Array.isArray(question)) {
               errors.push(`questions[${index}] must be an object.`);
               return;
             }
 
-            const allowedKeys = ["q", "a", "isGoal", "stage", "order"];
+            const allowedKeys = ["id", "q", "a", "isGoal", "stage", "order"];
             const unknownKey = Object.keys(question).find((key) => !allowedKeys.includes(key));
             if (unknownKey) {
               errors.push(`questions[${index}] has unsupported key "${unknownKey}".`);
+            }
+
+            if (question.id !== undefined) {
+              if (typeof question.id !== "string" || question.id.trim().length === 0 || question.id.length > 120) {
+                errors.push(`questions[${index}].id must be a non-empty string when present.`);
+              } else if (questionIds.has(question.id.trim())) {
+                errors.push(`questions[${index}].id must be unique.`);
+              } else {
+                questionIds.add(question.id.trim());
+              }
             }
 
             if (typeof question.q !== "string" || question.q.trim().length === 0 || question.q.length > 300) {
@@ -1348,6 +2063,7 @@
             }
 
             normalizedQuestions.push({
+              id: normalizeQuestionId(question, index, questionIds),
               q: String(question.q || "").trim().replace(/\r\n/g, "\n"),
               a: String(question.a || "").trim().replace(/\r\n/g, "\n"),
               isGoal: Boolean(question.isGoal),
@@ -1418,6 +2134,83 @@
 
             normalizedTouchpoints.push(normalizedTouchpoint);
           });
+
+          STAGE_IDS.forEach((stage) => {
+            const likelyCount = normalizedTouchpoints.filter((touchpoint) => touchpoint.stage === stage && touchpoint.likely === true).length;
+            const bestCount = normalizedTouchpoints.filter((touchpoint) => touchpoint.stage === stage && touchpoint.best === true).length;
+            if (likelyCount > 1) {
+              errors.push(`stage "${stage}" can have at most one likely touchpoint.`);
+            }
+            if (bestCount > 1) {
+              errors.push(`stage "${stage}" can have at most one best touchpoint.`);
+            }
+          });
+
+          input.connections.forEach((connection, index) => {
+            if (!connection || typeof connection !== "object" || Array.isArray(connection)) {
+              errors.push(`connections[${index}] must be an object.`);
+              return;
+            }
+
+            const allowedKeys = ["id", "from", "to", "fromOrder", "toOrder"];
+            const unknownKey = Object.keys(connection).find((key) => !allowedKeys.includes(key));
+            if (unknownKey) {
+              errors.push(`connections[${index}] has unsupported key "${unknownKey}".`);
+            }
+
+            if (connection.id !== undefined) {
+              if (typeof connection.id !== "string" || connection.id.trim().length === 0 || connection.id.length > 120) {
+                errors.push(`connections[${index}].id must be a non-empty string when present.`);
+              } else if (connectionIds.has(connection.id.trim())) {
+                errors.push(`connections[${index}].id must be unique.`);
+              } else {
+                connectionIds.add(connection.id.trim());
+              }
+            }
+
+            if (typeof connection.from !== "string" || connection.from.trim().length === 0 || connection.from.length > 120) {
+              errors.push(`connections[${index}].from must be a non-empty string.`);
+            } else if (!ids.has(connection.from)) {
+              errors.push(`connections[${index}].from must match an existing touchpoint id.`);
+            }
+
+            if (typeof connection.to !== "string" || connection.to.trim().length === 0 || connection.to.length > 120) {
+              errors.push(`connections[${index}].to must be a non-empty string.`);
+            } else if (!ids.has(connection.to)) {
+              errors.push(`connections[${index}].to must match an existing touchpoint id.`);
+            }
+
+            if (connection.fromOrder !== undefined && (!Number.isInteger(connection.fromOrder) || connection.fromOrder < 0)) {
+              errors.push(`connections[${index}].fromOrder must be a non-negative integer when present.`);
+            }
+
+            if (connection.toOrder !== undefined && (!Number.isInteger(connection.toOrder) || connection.toOrder < 0)) {
+              errors.push(`connections[${index}].toOrder must be a non-negative integer when present.`);
+            }
+
+            const pairKey = getConnectionPairKey(connection.from, connection.to);
+            if (pairKey && connectionPairs.has(pairKey)) {
+              errors.push(`connections[${index}] duplicates another directed connection.`);
+            } else if (pairKey) {
+              connectionPairs.add(pairKey);
+            }
+
+            const normalizedConnection = {
+              id: normalizeConnectionId(connection, index, connectionIds),
+              from: String(connection.from || ""),
+              to: String(connection.to || "")
+            };
+
+            if (Number.isInteger(connection.fromOrder) && connection.fromOrder >= 0) {
+              normalizedConnection.fromOrder = Number(connection.fromOrder);
+            }
+
+            if (Number.isInteger(connection.toOrder) && connection.toOrder >= 0) {
+              normalizedConnection.toOrder = Number(connection.toOrder);
+            }
+
+            normalizedConnections.push(normalizedConnection);
+          });
         }
 
         if (errors.length > 0) {
@@ -1428,15 +2221,17 @@
         }
 
         const normalized = {
-          schemaVersion: 2,
+          schemaVersion: 3,
           persona: input.persona.trim(),
-          nextTouchpointNumber: getNextTouchpointNumber(input.nextTouchpointNumber, normalizedTouchpoints),
+          nextTouchpointNumber: getNextTouchpointNumber(input.nextTouchpointNumber),
           questions: normalizedQuestions,
-          touchpoints: normalizedTouchpoints
+          touchpoints: normalizedTouchpoints,
+          connections: normalizedConnections
         };
 
         normalizeQuestionOrders(normalized.questions);
         normalizeOrders(normalized.touchpoints);
+        normalizeConnectionOrders(normalized.connections, normalized.touchpoints);
 
         return {
           valid: true,
@@ -1444,18 +2239,127 @@
         };
       }
 
-      function getNextTouchpointNumber(importedNext, touchpoints) {
-        const highestGeneratedNumber = touchpoints.reduce((highest, touchpoint) => {
-          const match = touchpoint.text.match(/^Touchpoint\s+(\d+)$/i);
-          return match ? Math.max(highest, Number(match[1])) : highest;
-        }, 0);
+      function migrateState(input) {
+        const migratedConnections = Array.isArray(input.connections)
+          ? input.connections.map((connection) => {
+              if (!connection || typeof connection !== "object" || Array.isArray(connection)) {
+                return connection;
+              }
 
-        return Math.max(importedNext, highestGeneratedNumber + 1, 1);
+              const migratedConnection = { ...connection };
+              if (Number.isInteger(migratedConnection.order) && migratedConnection.order >= 0 && !Number.isInteger(migratedConnection.fromOrder)) {
+                migratedConnection.fromOrder = migratedConnection.order;
+              }
+              delete migratedConnection.order;
+              return migratedConnection;
+            })
+          : input.connections;
+
+        if (input.schemaVersion === 2) {
+          return {
+            ...input,
+            schemaVersion: 3,
+            connections: Array.isArray(migratedConnections) ? migratedConnections : []
+          };
+        }
+
+        return {
+          ...input,
+          connections: migratedConnections
+        };
+      }
+
+      function getNextTouchpointNumber(importedNext) {
+        return Math.max(importedNext, 1);
+      }
+
+      function normalizeQuestionId(question, index, usedIds) {
+        if (question.id !== undefined && typeof question.id === "string" && question.id.trim()) {
+          return question.id.trim();
+        }
+
+        return claimUniqueId(`q-${question.isGoal ? "goal" : "question"}-${question.stage || "stage"}-${index + 1}`, usedIds);
+      }
+
+      function normalizeConnectionId(connection, index, usedIds) {
+        if (connection.id !== undefined && typeof connection.id === "string" && connection.id.trim()) {
+          return connection.id.trim();
+        }
+
+        return claimUniqueId(`conn-${connection.from || "from"}-${connection.to || "to"}-${index + 1}`, usedIds);
+      }
+
+      function createQuestionId() {
+        return claimUniqueId(`q-custom-${Date.now().toString(36)}`, new Set(state.questions.map((question) => question.id).filter(Boolean)));
+      }
+
+      function createConnectionId() {
+        return claimUniqueId(`conn-${Date.now().toString(36)}`, new Set(state.connections.map((connection) => connection.id).filter(Boolean)));
+      }
+
+      function ensureQuestionIds(questions) {
+        const usedIds = new Set();
+        questions.forEach((question, index) => {
+          if (typeof question.id === "string" && question.id.trim() && !usedIds.has(question.id.trim())) {
+            question.id = question.id.trim();
+            usedIds.add(question.id);
+            return;
+          }
+
+          question.id = claimUniqueId(`q-${question.isGoal ? "goal" : "question"}-${question.stage || "stage"}-${index + 1}`, usedIds);
+        });
+      }
+
+      function ensureConnectionIds(connections) {
+        const usedIds = new Set();
+        connections.forEach((connection, index) => {
+          if (typeof connection.id === "string" && connection.id.trim() && !usedIds.has(connection.id.trim())) {
+            connection.id = connection.id.trim();
+            usedIds.add(connection.id);
+            return;
+          }
+
+          connection.id = claimUniqueId(`conn-${connection.from || "from"}-${connection.to || "to"}-${index + 1}`, usedIds);
+        });
+      }
+
+      function claimUniqueId(base, usedIds) {
+        const normalizedBase = slugId(base);
+        let candidate = normalizedBase;
+        let suffix = 2;
+        while (usedIds.has(candidate)) {
+          candidate = `${normalizedBase}-${suffix}`;
+          suffix += 1;
+        }
+        usedIds.add(candidate);
+        return candidate;
+      }
+
+      function slugId(value) {
+        const slug = String(value || "")
+          .normalize("NFKD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "")
+          .slice(0, 96);
+        return slug || "id";
+      }
+
+      function getConnectionPairKey(from, to) {
+        if (typeof from !== "string" || typeof to !== "string" || from.trim() === "" || to.trim() === "") {
+          return null;
+        }
+
+        return `${from.trim()}\u0000${to.trim()}`;
       }
 
       function normalizeAllOrders() {
+        ensureQuestionIds(state.questions);
+        ensureConnectionIds(state.connections);
         normalizeQuestionOrders(state.questions);
         normalizeOrders(state.touchpoints);
+        normalizeConnectionOrders(state.connections, state.touchpoints);
       }
 
       function normalizeQuestionOrders(questions) {
@@ -1484,6 +2388,112 @@
         });
       }
 
+      function normalizeConnectionOrders(connections, touchpoints) {
+        if (!Array.isArray(connections) || !Array.isArray(touchpoints)) {
+          return;
+        }
+
+        const originalIndex = new Map(connections.map((connection, index) => [connection, index]));
+        const bySource = new Map();
+        const byTarget = new Map();
+        connections.forEach((connection) => {
+          delete connection.order;
+          if (!bySource.has(connection.from)) {
+            bySource.set(connection.from, []);
+          }
+          if (!byTarget.has(connection.to)) {
+            byTarget.set(connection.to, []);
+          }
+          bySource.get(connection.from).push(connection);
+          byTarget.get(connection.to).push(connection);
+        });
+
+        bySource.forEach((sourceConnections) => {
+          sourceConnections
+            .sort((left, right) => compareConnectionsByTarget(left, right, touchpoints, originalIndex))
+            .forEach((connection, index) => {
+              connection.fromOrder = index;
+            });
+        });
+
+        byTarget.forEach((targetConnections) => {
+          targetConnections
+            .sort((left, right) => compareConnectionsBySource(left, right, touchpoints, originalIndex))
+            .forEach((connection, index) => {
+              connection.toOrder = index;
+            });
+        });
+
+        connections.sort((left, right) => compareConnectionsBySourceAndOrder(left, right, touchpoints, originalIndex));
+      }
+
+      function compareConnectionsByTarget(left, right, touchpoints, originalIndex) {
+        const leftTarget = getTouchpointSortInfo(touchpoints, left.to);
+        const rightTarget = getTouchpointSortInfo(touchpoints, right.to);
+        const leftSource = getTouchpointSortInfo(touchpoints, left.from);
+        const rightSource = getTouchpointSortInfo(touchpoints, right.from);
+        return compareNumber(leftTarget.visualRank, rightTarget.visualRank) ||
+          compareNumber(leftTarget.stageIndex, rightTarget.stageIndex) ||
+          compareNumber(leftTarget.order, rightTarget.order) ||
+          compareNumber(leftTarget.visualRank - leftSource.visualRank, rightTarget.visualRank - rightSource.visualRank) ||
+          compareNumber(originalIndex.get(left), originalIndex.get(right));
+      }
+
+      function compareConnectionsBySource(left, right, touchpoints, originalIndex) {
+        const leftSource = getTouchpointSortInfo(touchpoints, left.from);
+        const rightSource = getTouchpointSortInfo(touchpoints, right.from);
+        const leftTarget = getTouchpointSortInfo(touchpoints, left.to);
+        const rightTarget = getTouchpointSortInfo(touchpoints, right.to);
+        return compareNumber(leftSource.visualRank, rightSource.visualRank) ||
+          compareNumber(leftSource.stageIndex, rightSource.stageIndex) ||
+          compareNumber(leftSource.order, rightSource.order) ||
+          compareNumber(leftTarget.visualRank - leftSource.visualRank, rightTarget.visualRank - rightSource.visualRank) ||
+          compareNumber(originalIndex.get(left), originalIndex.get(right));
+      }
+
+      function compareConnectionsBySourceAndOrder(left, right, touchpoints, originalIndex) {
+        const leftSource = getTouchpointSortInfo(touchpoints, left.from);
+        const rightSource = getTouchpointSortInfo(touchpoints, right.from);
+        const leftTarget = getTouchpointSortInfo(touchpoints, left.to);
+        const rightTarget = getTouchpointSortInfo(touchpoints, right.to);
+        return compareNumber(leftSource.stageIndex, rightSource.stageIndex) ||
+          compareNumber(leftSource.visualRank, rightSource.visualRank) ||
+          compareNumber(left.fromOrder, right.fromOrder) ||
+          compareNumber(leftTarget.stageIndex, rightTarget.stageIndex) ||
+          compareNumber(leftTarget.visualRank, rightTarget.visualRank) ||
+          compareNumber(left.toOrder, right.toOrder) ||
+          compareNumber(originalIndex.get(left), originalIndex.get(right));
+      }
+
+      function getTouchpointSortInfo(touchpoints, id) {
+        const touchpoint = touchpoints.find((candidate) => candidate.id === id);
+        if (!touchpoint) {
+          return {
+            stageIndex: Number.MAX_SAFE_INTEGER,
+            sectionIndex: Number.MAX_SAFE_INTEGER,
+            order: Number.MAX_SAFE_INTEGER,
+            visualRank: Number.MAX_SAFE_INTEGER
+          };
+        }
+
+        const stageIndex = STAGE_IDS.indexOf(touchpoint.stage);
+        const sectionIndex = SECTION_IDS.indexOf(touchpoint.section);
+        const normalizedSectionIndex = sectionIndex < 0 ? SECTION_IDS.length : sectionIndex;
+        const order = Number.isInteger(touchpoint.order) ? touchpoint.order : Number.MAX_SAFE_INTEGER;
+        return {
+          stageIndex: stageIndex < 0 ? Number.MAX_SAFE_INTEGER : stageIndex,
+          sectionIndex: normalizedSectionIndex,
+          order,
+          visualRank: normalizedSectionIndex * 1000 + order
+        };
+      }
+
+      function compareNumber(left, right) {
+        const normalizedLeft = Number.isFinite(left) ? left : Number.MAX_SAFE_INTEGER;
+        const normalizedRight = Number.isFinite(right) ? right : Number.MAX_SAFE_INTEGER;
+        return normalizedLeft - normalizedRight;
+      }
+
       function renderTouchpoints() {
         const activeFlashId = flashTouchpointId;
         const activeFlashKind = flashTouchpointKind;
@@ -1497,6 +2507,7 @@
         });
         flashTouchpointId = null;
         flashTouchpointKind = null;
+        renderConnections();
       }
 
       function getTouchpoints(section, stage) {
@@ -1532,27 +2543,720 @@
           }, { once: true });
         }
 
-        element.addEventListener("dragstart", handleDragStart);
-        element.addEventListener("dragend", handleDragEnd);
-        element.addEventListener("dblclick", () => startEditing(element, touchpoint.id));
-        element.addEventListener("keydown", (event) => {
-          if (event.key === "Enter") {
-            event.preventDefault();
-            startEditing(element, touchpoint.id);
-          }
-        });
-
         return element;
       }
 
-      function handleDragStart(event) {
-        const element = event.currentTarget;
+      function handleTouchpointClick(event, element = event.currentTarget) {
+        if (!connectionMode) {
+          return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+        const mode = connectionMode;
+        exitConnectionMode({ render: false });
+        completeConnection(mode, element.dataset.id);
+      }
+
+      function enterConnectionMode(fromId, options = {}) {
+        const source = state.touchpoints.find((touchpoint) => touchpoint.id === fromId);
+        if (!source) {
+          return;
+        }
+
+        connectionMode = {
+          fromId,
+          connectionId: typeof options.connectionId === "string" ? options.connectionId : null
+        };
+        document.body.classList.add("connection-mode");
+        syncConnectionModeDeleteButton();
+        activeConnectionPath.hidden = false;
+        renderConnections();
+        syncConnectionModeDeleteButton();
+
+        const start = getTouchpointEdgePoint(fromId, "right", 0);
+        if (start) {
+          activeConnectionPath.setAttribute("d", pointerConnectionPathData(start, {
+            x: start.x + 96,
+            y: start.y
+          }, ACTIVE_CONNECTION_ARROW_LENGTH));
+        }
+      }
+
+      function exitConnectionMode(options = {}) {
+        connectionMode = null;
+        document.body.classList.remove("connection-mode", "delete-active");
+        activeConnectionPath.hidden = true;
+        activeConnectionPath.removeAttribute("d");
+        resetDeleteButtonState();
+        if (options.render !== false) {
+          renderConnections();
+        }
+      }
+
+      function handleConnectionMouseMove(event) {
+        if (!connectionMode) {
+          return;
+        }
+        syncConnectionModeDeleteButton();
+
+        const start = getTouchpointEdgePoint(connectionMode.fromId, "right", 0);
+        if (!start) {
+          exitConnectionMode();
+          return;
+        }
+
+        const end = getPointInMap(event.clientX, event.clientY);
+        document.body.classList.toggle("delete-active", isPointerInsideDeleteZone(event));
+        activeConnectionPath.hidden = false;
+        activeConnectionPath.setAttribute("d", pointerConnectionPathData(start, end, ACTIVE_CONNECTION_ARROW_LENGTH));
+      }
+
+      function handleDocumentConnectionClick(event) {
+        if (!connectionMode) {
+          return;
+        }
+
+        if (event.target.closest(".touchpoint")) {
+          return;
+        }
+
+        const addButton = event.target.closest(".add-button");
+        if (addButton) {
+          event.preventDefault();
+          event.stopPropagation();
+          if (addButton.classList.contains("is-delete-button")) {
+            deleteConnectionModeConnection();
+          }
+          return;
+        }
+
+        if (event.target.closest(".delete-drop-target") || isPointerInsideDeleteZone(event)) {
+          event.preventDefault();
+          event.stopPropagation();
+          deleteConnectionModeConnection();
+        }
+      }
+
+      function completeConnection(mode, toId) {
+        if (!mode) {
+          return;
+        }
+
+        if (mode.connectionId && findConnectionById(mode.connectionId)) {
+          updateConnection(mode.connectionId, mode.fromId, toId);
+          return;
+        }
+
+        createConnection(mode.fromId, toId);
+      }
+
+      function createConnection(fromId, toId) {
+        if (!fromId || !toId) {
+          return;
+        }
+
+        const ids = new Set(state.touchpoints.map((touchpoint) => touchpoint.id));
+        if (!ids.has(fromId) || !ids.has(toId)) {
+          return;
+        }
+
+        if (hasConnectionBetween(fromId, toId)) {
+          setStatus("Connection already exists", { transient: false });
+          renderConnections();
+          return;
+        }
+
+        state.connections.push({
+          id: createConnectionId(),
+          from: fromId,
+          to: toId
+        });
+        saveState("Connection added");
+        renderConnections();
+      }
+
+      function updateConnection(id, fromId, toId) {
+        const index = getConnectionIndexById(id);
+        if (!fromId || !toId || index < 0) {
+          return;
+        }
+
+        const ids = new Set(state.touchpoints.map((touchpoint) => touchpoint.id));
+        if (!ids.has(fromId) || !ids.has(toId)) {
+          return;
+        }
+
+        if (hasConnectionBetween(fromId, toId, id)) {
+          setStatus("Connection already exists", { transient: false });
+          renderConnections();
+          return;
+        }
+
+        state.connections[index] = {
+          ...state.connections[index],
+          from: fromId,
+          to: toId
+        };
+        saveState("Connection updated");
+        renderConnections();
+      }
+
+      function editConnection(idOrIndex, clientX, clientY) {
+        const connection = findConnectionById(idOrIndex) || state.connections[Number(idOrIndex)];
+        if (!connection) {
+          return;
+        }
+
+        enterConnectionMode(connection.from, { connectionId: connection.id });
+        if (Number.isFinite(clientX) && Number.isFinite(clientY)) {
+          handleConnectionMouseMove({ clientX, clientY });
+        }
+      }
+
+      function findConnectionById(id) {
+        return state.connections.find((connection) => connection.id === id) || null;
+      }
+
+      function getConnectionIndexById(id) {
+        return state.connections.findIndex((connection) => connection.id === id);
+      }
+
+      function hasConnectionBetween(fromId, toId, exceptId = null) {
+        return state.connections.some((connection) => {
+          return connection.from === fromId &&
+            connection.to === toId &&
+            (!exceptId || connection.id !== exceptId);
+        });
+      }
+
+      function renderConnections() {
+        if (!connectionLayer || !connectionPaths || !state) {
+          return;
+        }
+
+        const width = Math.max(1, Math.ceil(mapGrid.scrollWidth));
+        const height = Math.max(1, Math.ceil(mapGrid.scrollHeight));
+        connectionLayer.setAttribute("width", String(width));
+        connectionLayer.setAttribute("height", String(height));
+        connectionLayer.setAttribute("viewBox", `0 0 ${width} ${height}`);
+        connectionPaths.replaceChildren();
+
+        const connections = state.connections || [];
+        const offsets = getConnectionOffsets(connections, CONNECTION_LINE_WIDTH);
+        connections.forEach((connection, index) => {
+          if (connectionMode && connectionMode.connectionId === connection.id) {
+            return;
+          }
+
+          const start = getTouchpointEdgePoint(connection.from, "right", offsets.from.get(index) || 0);
+          const end = getTouchpointEdgePoint(connection.to, "left", offsets.to.get(index) || 0);
+          if (!start || !end) {
+            return;
+          }
+
+          const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          path.classList.add("connection-path");
+          path.dataset.from = connection.from;
+          path.dataset.to = connection.to;
+          path.dataset.connectionIndex = String(index);
+          path.dataset.connectionId = connection.id || "";
+          path.setAttribute("d", connectionPathData(start, end, connection.from === connection.to, CONNECTION_ARROW_LENGTH, offsets.underpass.get(index) || 0));
+          connectionPaths.appendChild(path);
+        });
+
+        syncConnectionModeDeleteButton();
+      }
+
+      function getConnectionOffsets(connections, lineWidth) {
+        const spacing = lineWidth * CONNECTION_EDGE_SPACING_MULTIPLIER;
+        const metrics = getConnectionRenderMetrics(connections);
+        const outgoing = new Map();
+        const incoming = new Map();
+        const underpassGroups = new Map();
+        const from = new Map();
+        const to = new Map();
+        const underpass = new Map();
+
+        connections.forEach((connection, index) => {
+          if (!outgoing.has(connection.from)) {
+            outgoing.set(connection.from, []);
+          }
+          if (!incoming.has(connection.to)) {
+            incoming.set(connection.to, []);
+          }
+          outgoing.get(connection.from).push(index);
+          incoming.get(connection.to).push(index);
+
+          const underpassKey = getUnderpassGroupKey(connection);
+          if (underpassKey) {
+            if (!underpassGroups.has(underpassKey)) {
+              underpassGroups.set(underpassKey, []);
+            }
+            underpassGroups.get(underpassKey).push(index);
+          }
+        });
+
+        outgoing.forEach((indexes) => {
+          sortConnectionIndexes(indexes, metrics, "outgoing").forEach((connectionIndex, offsetIndex) => {
+            from.set(connectionIndex, centeredOffset(offsetIndex, indexes.length, spacing));
+          });
+        });
+
+        incoming.forEach((indexes) => {
+          sortConnectionIndexes(indexes, metrics, "incoming").forEach((connectionIndex, offsetIndex) => {
+            to.set(connectionIndex, centeredOffset(offsetIndex, indexes.length, spacing));
+          });
+        });
+
+        underpassGroups.forEach((indexes) => {
+          const occupiedLanes = [];
+          sortConnectionIndexes(indexes, metrics, "underpass").forEach((connectionIndex) => {
+            const baseY = getConnectionUnderpassBaseY(connections[connectionIndex]);
+            if (!Number.isFinite(baseY)) {
+              underpass.set(connectionIndex, 0);
+              return;
+            }
+
+            let laneY = baseY;
+            while (occupiedLanes.some((occupiedY) => Math.abs(occupiedY - laneY) < spacing - 0.1)) {
+              laneY += spacing;
+            }
+            occupiedLanes.push(laneY);
+            underpass.set(connectionIndex, laneY - baseY);
+          });
+        });
+
+        return {
+          from,
+          to,
+          underpass
+        };
+      }
+
+      function getConnectionUnderpassBaseY(connection) {
+        const fromTouchpoint = state.touchpoints.find((touchpoint) => touchpoint.id === connection.from);
+        const toTouchpoint = state.touchpoints.find((touchpoint) => touchpoint.id === connection.to);
+        if (!fromTouchpoint || !toTouchpoint) {
+          return null;
+        }
+
+        const fromStageIndex = STAGE_IDS.indexOf(fromTouchpoint.stage);
+        const toStageIndex = STAGE_IDS.indexOf(toTouchpoint.stage);
+        if (fromStageIndex < 0 || toStageIndex < 0) {
+          return null;
+        }
+
+        const originRect = mapGrid.getBoundingClientRect();
+        const start = {
+          section: fromTouchpoint.section,
+          stage: fromTouchpoint.stage,
+          stageIndex: fromStageIndex,
+          y: 0,
+          originRect
+        };
+        const end = {
+          section: toTouchpoint.section,
+          stage: toTouchpoint.stage,
+          stageIndex: toStageIndex,
+          y: 0,
+          originRect
+        };
+        const skippedStageIds = getSkippedStageIds(fromStageIndex, toStageIndex);
+        if (skippedStageIds.length > 0) {
+          const underpassStageIds = fromStageIndex > toStageIndex
+            ? STAGE_IDS.slice(toStageIndex, fromStageIndex + 1)
+            : skippedStageIds;
+          return getSkippedUnderpassY(underpassStageIds, start, end);
+        }
+
+        if (fromStageIndex === toStageIndex || fromStageIndex > toStageIndex) {
+          return getStageUnderpassY(getCurrentRouteUnderpassStageIds(start, end), start, end);
+        }
+
+        return null;
+      }
+
+      function getConnectionRenderMetrics(connections) {
+        const mapRect = mapGrid.getBoundingClientRect();
+        const rendered = new Map();
+        return connections.map((connection, index) => {
+          const from = getRenderedTouchpointSortInfo(connection.from, mapRect, rendered);
+          const to = getRenderedTouchpointSortInfo(connection.to, mapRect, rendered);
+          return {
+            index,
+            fromOrder: Number.isInteger(connection.fromOrder) ? connection.fromOrder : index,
+            toOrder: Number.isInteger(connection.toOrder) ? connection.toOrder : index,
+            from,
+            to,
+            deltaY: to.centerY - from.centerY,
+            routeMidY: (from.centerY + to.centerY) / 2
+          };
+        });
+      }
+
+      function getRenderedTouchpointSortInfo(id, mapRect, cache) {
+        if (cache.has(id)) {
+          return cache.get(id);
+        }
+
+        const touchpoint = state.touchpoints.find((candidate) => candidate.id === id);
+        const element = document.querySelector(`.touchpoint[data-id="${cssEscape(id)}"]`);
+        const fallback = getTouchpointSortInfo(state.touchpoints, id);
+        const rect = element ? element.getBoundingClientRect() : null;
+        const info = {
+          stageIndex: fallback.stageIndex,
+          sectionIndex: fallback.sectionIndex,
+          order: fallback.order,
+          centerY: rect ? rect.top - mapRect.top + rect.height / 2 : fallback.visualRank,
+          visualRank: rect ? rect.top - mapRect.top + rect.height / 2 : fallback.visualRank,
+          stage: touchpoint ? touchpoint.stage : null
+        };
+        cache.set(id, info);
+        return info;
+      }
+
+      function sortConnectionIndexes(indexes, metrics, mode) {
+        return indexes.slice().sort((leftIndex, rightIndex) => {
+          const left = metrics[leftIndex];
+          const right = metrics[rightIndex];
+          if (!left || !right) {
+            return compareNumber(leftIndex, rightIndex);
+          }
+
+          if (mode === "outgoing") {
+            return compareNumber(left.fromOrder, right.fromOrder) ||
+              compareNumber(left.to.visualRank, right.to.visualRank) ||
+              compareNumber(left.to.stageIndex, right.to.stageIndex) ||
+              compareNumber(left.toOrder, right.toOrder) ||
+              compareNumber(leftIndex, rightIndex);
+          }
+
+          if (mode === "incoming") {
+            return compareNumber(left.toOrder, right.toOrder) ||
+              compareNumber(left.from.visualRank, right.from.visualRank) ||
+              compareNumber(left.from.stageIndex, right.from.stageIndex) ||
+              compareNumber(left.fromOrder, right.fromOrder) ||
+              compareNumber(leftIndex, rightIndex);
+          }
+
+          return compareNumber(left.routeMidY, right.routeMidY) ||
+            compareNumber(left.from.stageIndex, right.from.stageIndex) ||
+            compareNumber(left.to.stageIndex, right.to.stageIndex) ||
+            compareNumber(left.fromOrder, right.fromOrder) ||
+            compareNumber(left.toOrder, right.toOrder) ||
+            compareNumber(leftIndex, rightIndex);
+        });
+      }
+
+      function getUnderpassGroupKey(connection) {
+        const fromTouchpoint = state.touchpoints.find((touchpoint) => touchpoint.id === connection.from);
+        const toTouchpoint = state.touchpoints.find((touchpoint) => touchpoint.id === connection.to);
+        if (!fromTouchpoint || !toTouchpoint) {
+          return null;
+        }
+
+        const fromStageIndex = STAGE_IDS.indexOf(fromTouchpoint.stage);
+        const toStageIndex = STAGE_IDS.indexOf(toTouchpoint.stage);
+        if (fromStageIndex < 0 || toStageIndex < 0) {
+          return null;
+        }
+
+        const sections = getConnectionSectionScope(fromTouchpoint.section, toTouchpoint.section).join(",");
+        const skippedStageIds = getSkippedStageIds(fromStageIndex, toStageIndex);
+        if (skippedStageIds.length > 0) {
+          return `underpass:${sections}`;
+        }
+
+        if (fromStageIndex === toStageIndex || fromStageIndex > toStageIndex) {
+          return `underpass:${sections}`;
+        }
+
+        return null;
+      }
+
+      function centeredOffset(index, count, spacing) {
+        return (index - (count - 1) / 2) * spacing;
+      }
+
+      function getTouchpointEdgePoint(id, side, offset) {
+        const element = document.querySelector(`.touchpoint[data-id="${cssEscape(id)}"]`);
+        const touchpoint = state.touchpoints.find((candidate) => candidate.id === id);
+        if (!element) {
+          return null;
+        }
+
+        const mapRect = mapGrid.getBoundingClientRect();
+        const rect = element.getBoundingClientRect();
+        return {
+          id,
+          section: touchpoint ? touchpoint.section : null,
+          stage: touchpoint ? touchpoint.stage : null,
+          stageIndex: touchpoint ? STAGE_IDS.indexOf(touchpoint.stage) : -1,
+          originRect: mapRect,
+          x: side === "right" ? rect.right - mapRect.left : rect.left - mapRect.left,
+          y: rect.top - mapRect.top + rect.height / 2 + offset
+        };
+      }
+
+      function getPointInMap(clientX, clientY) {
+        const mapRect = mapGrid.getBoundingClientRect();
+        return {
+          x: clientX - mapRect.left,
+          y: clientY - mapRect.top
+        };
+      }
+
+      function connectionPathData(start, end, isSelfConnection = false, arrowLength = CONNECTION_ARROW_LENGTH, underpassOffset = 0) {
+        return routeToSvgPath(getConnectionRoute(start, end, isSelfConnection, arrowLength, underpassOffset));
+      }
+
+      function getConnectionRoute(start, end, isSelfConnection = false, arrowLength = CONNECTION_ARROW_LENGTH, underpassOffset = 0) {
+        const startBounds = getStageColumnBounds(start.stage, start.originRect);
+        const startExitX = getConnectionStartExitX(start, end, startBounds);
+        const endBase = {
+          x: end.x - arrowLength,
+          y: end.y
+        };
+        const route = [
+          { type: "M", x: start.x, y: start.y },
+          { type: "L", x: startExitX, y: start.y }
+        ];
+
+        if (isSelfConnection || !Number.isInteger(start.stageIndex) || !Number.isInteger(end.stageIndex) || start.stageIndex === end.stageIndex) {
+          appendCurrentStageUnderpassRoute(route, start, end, endBase, startExitX, underpassOffset);
+          return route;
+        }
+
+        const skippedStageIds = getSkippedStageIds(start.stageIndex, end.stageIndex);
+        if (skippedStageIds.length > 0) {
+          appendSkippedStageRoute(route, start, end, endBase, startExitX, skippedStageIds, underpassOffset);
+          return route;
+        }
+
+        if (start.stageIndex > end.stageIndex) {
+          appendCurrentStageUnderpassRoute(route, start, end, endBase, startExitX, underpassOffset);
+          return route;
+        }
+
+        appendAdjacentStageRoute(route, start, endBase, startExitX);
+        return route;
+      }
+
+      function getConnectionStartExitX(start, end, startBounds) {
+        if (!startBounds) {
+          return start.x + 80;
+        }
+
+        const isFinalStageBackward = start.stageIndex === STAGE_IDS.length - 1 && start.stageIndex > end.stageIndex;
+        const exitRight = isFinalStageBackward
+          ? startBounds.right + CONNECTION_FINAL_STAGE_EXIT
+          : startBounds.right;
+        return Math.max(start.x, exitRight);
+      }
+
+      function pointerConnectionPathData(start, end, arrowLength) {
+        const startBounds = getStageColumnBounds(start.stage, start.originRect);
+        const startExitX = startBounds ? Math.max(start.x, startBounds.right) : start.x + 80;
+        const endBase = {
+          x: end.x - arrowLength,
+          y: end.y
+        };
+        return routeToSvgPath([
+          { type: "M", x: start.x, y: start.y },
+          { type: "L", x: startExitX, y: start.y },
+          {
+            type: "C",
+            cp1x: startExitX + CONNECTION_GUTTER_BEND,
+            cp1y: start.y,
+            cp2x: endBase.x - CONNECTION_GUTTER_BEND,
+            cp2y: endBase.y,
+            x: endBase.x,
+            y: endBase.y
+          }
+        ]);
+      }
+
+      function appendAdjacentStageRoute(route, start, endBase, startExitX) {
+        const handle = Math.max(CONNECTION_GUTTER_BEND, Math.abs(endBase.x - startExitX) * 0.32);
+        route.push({
+          type: "C",
+          cp1x: startExitX + CONNECTION_GUTTER_BEND,
+          cp1y: start.y,
+          cp2x: endBase.x - handle,
+          cp2y: endBase.y,
+          x: endBase.x,
+          y: endBase.y
+        });
+      }
+
+      function appendCurrentStageUnderpassRoute(route, start, end, endBase, startExitX, underpassOffset) {
+        const underY = getStageUnderpassY(getCurrentRouteUnderpassStageIds(start, end), start, end) + underpassOffset;
+        const direction = endBase.x >= startExitX ? 1 : -1;
+        const outsideX = startExitX + CONNECTION_GUTTER_BEND;
+        const underStartX = startExitX + direction * CONNECTION_GUTTER_BEND;
+        const underEndX = endBase.x - CONNECTION_GUTTER_BEND;
+        route.push({
+          type: "C",
+          cp1x: outsideX,
+          cp1y: start.y,
+          cp2x: underStartX - direction * CONNECTION_GUTTER_BEND,
+          cp2y: underY,
+          x: underStartX,
+          y: underY
+        });
+        route.push({
+          type: "L",
+          x: underEndX,
+          y: underY
+        });
+        route.push({
+          type: "C",
+          cp1x: underEndX - CONNECTION_GUTTER_BEND,
+          cp1y: underY,
+          cp2x: endBase.x - CONNECTION_GUTTER_BEND,
+          cp2y: endBase.y,
+          x: endBase.x,
+          y: endBase.y
+        });
+      }
+
+      function appendSkippedStageRoute(route, start, end, endBase, startExitX, skippedStageIds, underpassOffset) {
+        const direction = start.stageIndex < end.stageIndex ? 1 : -1;
+        const nearStageId = direction > 0 ? skippedStageIds[0] : skippedStageIds[skippedStageIds.length - 1];
+        const farStageId = direction > 0 ? skippedStageIds[skippedStageIds.length - 1] : skippedStageIds[0];
+        const nearBounds = getStageColumnBounds(nearStageId, start.originRect);
+        const farBounds = getStageColumnBounds(farStageId, start.originRect);
+        const underStartX = nearBounds ? (direction > 0 ? nearBounds.left : nearBounds.right) : startExitX + direction * 90;
+        const underEndX = farBounds ? (direction > 0 ? farBounds.right : farBounds.left) : endBase.x - direction * 90;
+        const underpassStageIds = start.stageIndex > end.stageIndex
+          ? STAGE_IDS.slice(end.stageIndex, start.stageIndex + 1)
+          : skippedStageIds;
+        const underY = getSkippedUnderpassY(underpassStageIds, start, end) + underpassOffset;
+
+        route.push({
+          type: "C",
+          cp1x: startExitX + CONNECTION_GUTTER_BEND,
+          cp1y: start.y,
+          cp2x: underStartX - direction * CONNECTION_GUTTER_BEND,
+          cp2y: underY,
+          x: underStartX,
+          y: underY
+        });
+        route.push({
+          type: "L",
+          x: underEndX,
+          y: underY
+        });
+        route.push({
+          type: "C",
+          cp1x: underEndX + direction * CONNECTION_GUTTER_BEND,
+          cp1y: underY,
+          cp2x: endBase.x - CONNECTION_GUTTER_BEND,
+          cp2y: endBase.y,
+          x: endBase.x,
+          y: endBase.y
+        });
+      }
+
+      function getSkippedStageIds(startStageIndex, endStageIndex) {
+        const first = Math.min(startStageIndex, endStageIndex) + 1;
+        const last = Math.max(startStageIndex, endStageIndex) - 1;
+        return STAGE_IDS.slice(first, last + 1);
+      }
+
+      function getSkippedUnderpassY(skippedStageIds, start, end) {
+        return getStageUnderpassY(skippedStageIds, start, end);
+      }
+
+      function getCurrentRouteUnderpassStageIds(start, end) {
+        if (
+          Number.isInteger(start.stageIndex) &&
+          Number.isInteger(end.stageIndex) &&
+          start.stageIndex > end.stageIndex
+        ) {
+          return STAGE_IDS.slice(end.stageIndex, start.stageIndex + 1);
+        }
+
+        return [start.stage];
+      }
+
+      function getStageUnderpassY(stageIds, start, end) {
+        const sections = getConnectionSectionScope(start.section, end.section);
+        const bottoms = getStageTouchpointBottoms(stageIds, sections, start.originRect);
+
+        if (bottoms.length === 0) {
+          return Math.max(start.y, end.y) + CONNECTION_SAME_STAGE_LOOP;
+        }
+
+        return Math.max(...bottoms) + CONNECTION_UNDERPASS_PADDING;
+      }
+
+      function getStageTouchpointBottoms(stageIds, sections, originRect) {
+        return stageIds.flatMap((stageId) => {
+          return sections.flatMap((section) => {
+            return Array.from(document.querySelectorAll(`.touch-cell[data-section="${section}"][data-stage="${cssEscape(stageId)}"] .touchpoint`))
+              .map((element) => element.getBoundingClientRect().bottom - originRect.top);
+          });
+        }).filter(Number.isFinite);
+      }
+
+      function getConnectionSectionScope(startSection, endSection) {
+        if (startSection && endSection && startSection !== endSection) {
+          return SECTION_IDS;
+        }
+
+        const section = startSection || endSection;
+        return SECTION_IDS.includes(section) ? [section] : SECTION_IDS;
+      }
+
+      function getStageColumnBounds(stageId, originRect = mapGrid.getBoundingClientRect()) {
+        if (!stageId) {
+          return null;
+        }
+
+        const cell = document.querySelector(`.touch-cell[data-section="internal"][data-stage="${cssEscape(stageId)}"]`);
+        if (!cell) {
+          return null;
+        }
+
+        const rect = cell.getBoundingClientRect();
+        return {
+          left: rect.left - originRect.left,
+          right: rect.right - originRect.left,
+          width: rect.width
+        };
+      }
+
+      function routeToSvgPath(route) {
+        return route.map((command) => {
+          if (command.type === "M" || command.type === "L") {
+            return `${command.type} ${roundPathNumber(command.x)} ${roundPathNumber(command.y)}`;
+          }
+
+          return `C ${roundPathNumber(command.cp1x)} ${roundPathNumber(command.cp1y)}, ${roundPathNumber(command.cp2x)} ${roundPathNumber(command.cp2y)}, ${roundPathNumber(command.x)} ${roundPathNumber(command.y)}`;
+        }).join(" ");
+      }
+
+      function roundPathNumber(value) {
+        return Math.round(value * 10) / 10;
+      }
+
+      function cssEscape(value) {
+        if (window.CSS && typeof window.CSS.escape === "function") {
+          return window.CSS.escape(String(value));
+        }
+        return String(value).replace(/["\\]/g, "\\$&");
+      }
+
+      function handleDragStart(event, element = event.currentTarget) {
         if (element.classList.contains("editing")) {
           event.preventDefault();
           return;
         }
 
         draggedId = element.dataset.id;
+        activateDeleteButtonForTouchpointId(draggedId);
         event.dataTransfer.effectAllowed = "move";
         event.dataTransfer.setData("text/plain", draggedId);
         window.requestAnimationFrame(() => {
@@ -1562,11 +3266,111 @@
       }
 
       function handleDragEnd() {
+        cleanupDragState();
+      }
+
+      function handleQuestionDragStart(event, element = event.currentTarget) {
+        draggedQuestionKey = element.dataset.questionKey;
+        activateDeleteButtonForQuestionKey(draggedQuestionKey);
+        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData("text/plain", draggedQuestionKey);
+        window.requestAnimationFrame(() => {
+          element.classList.add("dragging");
+          document.body.classList.add("is-dragging");
+        });
+      }
+
+      function handleQuestionDragEnd() {
+        cleanupDragState();
+      }
+
+      function cleanupDragState() {
         draggedId = null;
+        draggedQuestionKey = null;
         clearDropMarker();
         document.querySelectorAll(".touch-cell.drag-over").forEach((cell) => cell.classList.remove("drag-over"));
+        document.querySelectorAll(".goal-cell.drag-over, .question-cell.drag-over").forEach((cell) => cell.classList.remove("drag-over"));
         document.querySelectorAll(".touchpoint.dragging").forEach((element) => element.classList.remove("dragging"));
+        document.querySelectorAll(".question-button.dragging").forEach((element) => element.classList.remove("dragging"));
         document.body.classList.remove("is-dragging", "delete-active");
+        resetDeleteButtonState();
+      }
+
+      function hasActiveDrag() {
+        return Boolean(draggedId || draggedQuestionKey);
+      }
+
+      function activateDeleteButtonForTouchpointId(id, activeLabel = "Drop to delete") {
+        const touchpoint = state.touchpoints.find((candidate) => candidate.id === id);
+        if (!touchpoint) {
+          resetDeleteButtonState();
+          return;
+        }
+
+        activateDeleteButtonForRow(touchpoint.section === "external" ? "external" : "internal", activeLabel);
+      }
+
+      function activateDeleteButtonForQuestionKey(key) {
+        const question = findQuestionByKey(key);
+        if (!question) {
+          resetDeleteButtonState();
+          return;
+        }
+
+        activateDeleteButtonForRow(question.isGoal ? "goals" : "questions");
+      }
+
+      function activateDeleteButtonForRow(row, activeLabel = "Drop to delete") {
+        const button = DELETE_ROW_BUTTONS[row];
+        if (!button) {
+          resetDeleteButtonState();
+          return;
+        }
+
+        resetDeleteButtonState();
+        if (!button.dataset.defaultAriaLabel) {
+          button.dataset.defaultAriaLabel = button.getAttribute("aria-label") || "";
+        }
+        if (!button.dataset.defaultTitle) {
+          button.dataset.defaultTitle = button.getAttribute("title") || "";
+        }
+        button.classList.add("is-delete-button");
+        button.dataset.deleteRow = row;
+        button.setAttribute("aria-label", activeLabel);
+        button.title = activeLabel;
+      }
+
+      function syncConnectionModeDeleteButton() {
+        if (!connectionMode) {
+          return;
+        }
+
+        const source = state.touchpoints.find((touchpoint) => touchpoint.id === connectionMode.fromId);
+        if (!source) {
+          resetDeleteButtonState();
+          return;
+        }
+
+        const row = source.section === "external" ? "external" : "internal";
+        const button = DELETE_ROW_BUTTONS[row];
+        if (!button || (button.classList.contains("is-delete-button") && button.getAttribute("aria-label") === "Delete connection")) {
+          return;
+        }
+
+        activateDeleteButtonForRow(row, "Delete connection");
+      }
+
+      function resetDeleteButtonState() {
+        Object.values(DELETE_ROW_BUTTONS).forEach((button) => {
+          button.classList.remove("is-delete-button");
+          button.removeAttribute("data-delete-row");
+          if (button.dataset.defaultAriaLabel) {
+            button.setAttribute("aria-label", button.dataset.defaultAriaLabel);
+          }
+          if (button.dataset.defaultTitle) {
+            button.title = button.dataset.defaultTitle;
+          }
+        });
       }
 
       function handleCellDragOver(event) {
@@ -1649,6 +3453,9 @@
         if (dropMarker && dropMarker.parentElement) {
           dropMarker.parentElement.removeChild(dropMarker);
         }
+        if (questionDropMarker && questionDropMarker.parentElement) {
+          questionDropMarker.parentElement.removeChild(questionDropMarker);
+        }
       }
 
       function moveTouchpoint(id, nextSection, nextStage, nextOrder) {
@@ -1659,6 +3466,7 @@
 
         touchpoint.section = nextSection;
         touchpoint.stage = nextStage;
+        enforceTouchpointFlagExclusivity(touchpoint);
 
         const peers = state.touchpoints
           .filter((candidate) => candidate.section === nextSection && candidate.stage === nextStage && candidate.id !== id)
@@ -1674,8 +3482,154 @@
         renderTouchpoints();
       }
 
+      function handleQuestionCellDragOver(event) {
+        if (!draggedQuestionKey) {
+          return;
+        }
+
+        event.preventDefault();
+        event.dataTransfer.dropEffect = "move";
+        document.body.classList.remove("delete-active");
+
+        const cell = event.currentTarget;
+        document.querySelectorAll(".goal-cell.drag-over, .question-cell.drag-over").forEach((otherCell) => {
+          if (otherCell !== cell) {
+            otherCell.classList.remove("drag-over");
+          }
+        });
+        cell.classList.add("drag-over");
+
+        const container = getQuestionDropContainer(cell);
+        const afterElement = getQuestionElementAfterPointer(container, event.clientY);
+        const marker = getQuestionDropMarker(container);
+        if (!afterElement) {
+          container.appendChild(marker);
+        } else {
+          container.insertBefore(marker, afterElement);
+        }
+      }
+
+      function handleQuestionCellDragLeave(event) {
+        const cell = event.currentTarget;
+        if (!cell.contains(event.relatedTarget)) {
+          cell.classList.remove("drag-over");
+        }
+      }
+
+      function handleQuestionCellDrop(event) {
+        if (!draggedQuestionKey) {
+          return;
+        }
+
+        event.preventDefault();
+        const cell = event.currentTarget;
+        const container = getQuestionDropContainer(cell);
+        const orderedChildren = Array.from(container.children).filter((child) => {
+          return child.id === "questionDropMarker" || getQuestionButtonFromDropChild(child);
+        });
+        const markerIndex = Math.max(0, orderedChildren.indexOf(getQuestionDropMarker(container)));
+        moveQuestion(draggedQuestionKey, cell.dataset.isGoal === "true", cell.dataset.stage, markerIndex);
+        cleanupDragState();
+      }
+
+      function getQuestionDropContainer(cell) {
+        if (cell.dataset.isGoal === "true") {
+          return cell.querySelector(".goal-list");
+        }
+        return cell.querySelector("ol");
+      }
+
+      function getQuestionButtonFromDropChild(child) {
+        if (child.classList && child.classList.contains("question-button") && !child.classList.contains("dragging")) {
+          return child;
+        }
+        return child.querySelector ? child.querySelector(".question-button:not(.dragging)") : null;
+      }
+
+      function getQuestionElementAfterPointer(container, pointerY) {
+        const draggableElements = Array.from(container.children)
+          .map((child) => ({
+            child,
+            button: getQuestionButtonFromDropChild(child)
+          }))
+          .filter((entry) => entry.button);
+
+        const closest = draggableElements.reduce((best, entry) => {
+          const box = entry.button.getBoundingClientRect();
+          const offset = pointerY - box.top - box.height / 2;
+          if (offset < 0 && offset > best.offset) {
+            return {
+              offset,
+              element: entry.child
+            };
+          }
+          return best;
+        }, {
+          offset: Number.NEGATIVE_INFINITY,
+          element: null
+        });
+
+        return closest.element;
+      }
+
+      function getQuestionDropMarker(container) {
+        const tagName = container.tagName === "OL" ? "li" : "div";
+        if (!questionDropMarker || questionDropMarker.tagName.toLowerCase() !== tagName) {
+          if (questionDropMarker && questionDropMarker.parentElement) {
+            questionDropMarker.parentElement.removeChild(questionDropMarker);
+          }
+          questionDropMarker = document.createElement(tagName);
+          questionDropMarker.className = "drop-marker question-drop-marker";
+          questionDropMarker.id = "questionDropMarker";
+        }
+        return questionDropMarker;
+      }
+
+      function findQuestionByKey(key) {
+        const directMatch = state.questions.find((question) => question.id === key);
+        if (directMatch) {
+          return directMatch;
+        }
+
+        const match = String(key || "").match(/^(goal|question):([a-z]+):(\d+)$/);
+        if (!match) {
+          return null;
+        }
+
+        const isGoal = match[1] === "goal";
+        const stage = match[2];
+        const order = Number(match[3]);
+        return state.questions.find((question) => {
+          return question.isGoal === isGoal &&
+            question.stage === stage &&
+            question.order === order;
+        }) || null;
+      }
+
+      function moveQuestion(key, nextIsGoal, nextStage, nextOrder) {
+        const question = findQuestionByKey(key);
+        if (!question) {
+          return;
+        }
+
+        question.isGoal = nextIsGoal;
+        question.stage = nextStage;
+
+        const peers = state.questions
+          .filter((candidate) => candidate.isGoal === nextIsGoal && candidate.stage === nextStage && candidate !== question)
+          .sort((a, b) => a.order - b.order || a.q.localeCompare(b.q));
+
+        peers.splice(Math.min(nextOrder, peers.length), 0, question);
+        peers.forEach((peer, index) => {
+          peer.order = index;
+        });
+
+        saveState("Saved");
+        renderQuestionRows();
+      }
+
       function handleDeleteDragOver(event) {
-        if (!draggedId) {
+        if (!hasActiveDrag()) {
           return;
         }
 
@@ -1683,6 +3637,7 @@
         event.dataTransfer.dropEffect = "move";
         clearDropMarker();
         document.querySelectorAll(".touch-cell.drag-over").forEach((cell) => cell.classList.remove("drag-over"));
+        document.querySelectorAll(".goal-cell.drag-over, .question-cell.drag-over").forEach((cell) => cell.classList.remove("drag-over"));
         document.body.classList.add("delete-active");
       }
 
@@ -1693,16 +3648,41 @@
       }
 
       function handleDeleteDrop(event) {
-        if (!draggedId) {
+        if (!hasActiveDrag()) {
           return;
         }
 
         event.preventDefault();
-        deleteDraggedTouchpoint();
+        deleteDraggedItem();
+      }
+
+      function handleDeleteZoneClick(event) {
+        if (!connectionMode || event.target.closest(".add-button")) {
+          return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+        deleteConnectionModeConnection();
+      }
+
+      function deleteConnectionModeConnection() {
+        const mode = connectionMode;
+        exitConnectionMode({ render: false });
+
+        const connectionIndex = mode && mode.connectionId ? getConnectionIndexById(mode.connectionId) : -1;
+        if (connectionIndex >= 0) {
+          state.connections.splice(connectionIndex, 1);
+          saveState("Connection deleted");
+        } else {
+          setStatus("Connection canceled");
+        }
+
+        renderConnections();
       }
 
       function handleDocumentDragOver(event) {
-        if (!draggedId || !isPointerInsideDeleteZone(event)) {
+        if (!hasActiveDrag() || !isPointerInsideDeleteZone(event)) {
           return;
         }
 
@@ -1710,17 +3690,18 @@
         event.dataTransfer.dropEffect = "move";
         clearDropMarker();
         document.querySelectorAll(".touch-cell.drag-over").forEach((cell) => cell.classList.remove("drag-over"));
+        document.querySelectorAll(".goal-cell.drag-over, .question-cell.drag-over").forEach((cell) => cell.classList.remove("drag-over"));
         document.body.classList.add("delete-active");
       }
 
       function handleDocumentDrop(event) {
-        if (!draggedId || !isPointerInsideDeleteZone(event)) {
+        if (!hasActiveDrag() || !isPointerInsideDeleteZone(event)) {
           return;
         }
 
         event.preventDefault();
         event.stopPropagation();
-        deleteDraggedTouchpoint();
+        deleteDraggedItem();
       }
 
       function isPointerInsideDeleteZone(event) {
@@ -1733,10 +3714,34 @@
       }
 
       function deleteDraggedTouchpoint() {
-        state.touchpoints = state.touchpoints.filter((touchpoint) => touchpoint.id !== draggedId);
+        const deletedId = draggedId;
+        state.touchpoints = state.touchpoints.filter((touchpoint) => touchpoint.id !== deletedId);
+        state.connections = state.connections.filter((connection) => connection.from !== deletedId && connection.to !== deletedId);
         saveState("Deleted");
         renderTouchpoints();
-        handleDragEnd();
+        cleanupDragState();
+      }
+
+      function deleteDraggedQuestion() {
+        const question = findQuestionByKey(draggedQuestionKey);
+        if (!question) {
+          cleanupDragState();
+          return;
+        }
+
+        state.questions = state.questions.filter((candidate) => candidate !== question);
+        saveState("Deleted");
+        renderQuestionRows();
+        cleanupDragState();
+      }
+
+      function deleteDraggedItem() {
+        if (draggedQuestionKey) {
+          deleteDraggedQuestion();
+          return;
+        }
+
+        deleteDraggedTouchpoint();
       }
 
       function addTouchpoint(section) {
@@ -1755,6 +3760,22 @@
         queueTouchpointFlash(touchpoint.id, "added");
         saveState("Added");
         renderTouchpoints();
+      }
+
+      function addQuestion(isGoal) {
+        const stage = "discover";
+        const question = {
+          id: createQuestionId(),
+          q: "Placeholder question?",
+          a: "TODO answer",
+          isGoal,
+          stage,
+          order: getQuestions(isGoal, stage).length
+        };
+
+        state.questions.push(question);
+        saveState("Added");
+        renderQuestionRows();
       }
 
       function queueTouchpointFlash(id, kind) {
@@ -1818,14 +3839,24 @@
         element.classList.add("editing");
         element.replaceChildren();
 
+        const flagControls = createTouchpointFlagControls(touchpoint);
+        element.appendChild(flagControls);
+
         const editor = document.createElement("textarea");
         editor.className = "touchpoint-editor";
         editor.value = touchpoint.text;
         editor.rows = Math.min(5, Math.max(1, touchpoint.text.split("\n").length));
         element.appendChild(editor);
 
+        const connectButton = document.createElement("button");
+        connectButton.className = "touchpoint-connect-button";
+        connectButton.type = "button";
+        connectButton.setAttribute("aria-label", "Create connection from this touchpoint");
+        connectButton.title = "Create connection";
+        element.appendChild(connectButton);
+
         let complete = false;
-        const finish = (shouldSave) => {
+        const finish = (shouldSave, options = {}) => {
           if (complete) {
             return;
           }
@@ -1838,8 +3869,20 @@
           }
 
           renderTouchpoints();
+
+          if (options.connect) {
+            enterConnectionMode(id);
+          }
         };
 
+        connectButton.addEventListener("pointerdown", (event) => {
+          event.preventDefault();
+        });
+        connectButton.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          finish(true, { connect: true });
+        });
         editor.addEventListener("blur", () => finish(true), { once: true });
         editor.addEventListener("keydown", (event) => {
           if (event.key === "Escape") {
@@ -1861,54 +3904,473 @@
         });
       }
 
+      function createTouchpointFlagControls(touchpoint) {
+        const controls = document.createElement("div");
+        controls.className = "touchpoint-flag-buttons";
+        controls.appendChild(createTouchpointFlagButton(touchpoint, "likely", "%", "likely"));
+        controls.appendChild(createTouchpointFlagButton(touchpoint, "best", "♥", "best"));
+        return controls;
+      }
+
+      function createTouchpointFlagButton(touchpoint, flag, label, description) {
+        const button = document.createElement("button");
+        button.className = `touchpoint-flag-button ${flag}-flag`;
+        button.type = "button";
+        button.textContent = label;
+        button.title = `Toggle ${description}`;
+        button.setAttribute("aria-label", `Toggle ${description} touchpoint`);
+        updateTouchpointFlagButton(button, touchpoint, flag);
+
+        button.addEventListener("pointerdown", (event) => {
+          event.preventDefault();
+        });
+        button.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          toggleTouchpointFlag(touchpoint.id, flag);
+          updateTouchpointFlagButtons(button.parentElement, touchpoint);
+        });
+
+        return button;
+      }
+
+      function updateTouchpointFlagButtons(container, touchpoint) {
+        if (!container) {
+          return;
+        }
+
+        container.querySelectorAll(".touchpoint-flag-button").forEach((button) => {
+          if (button.classList.contains("likely-flag")) {
+            updateTouchpointFlagButton(button, touchpoint, "likely");
+          } else if (button.classList.contains("best-flag")) {
+            updateTouchpointFlagButton(button, touchpoint, "best");
+          }
+        });
+      }
+
+      function updateTouchpointFlagButton(button, touchpoint, flag) {
+        const active = touchpoint[flag] === true;
+        button.classList.toggle("is-active", active);
+        button.setAttribute("aria-pressed", String(active));
+      }
+
+      function toggleTouchpointFlag(id, flag) {
+        const touchpoint = state.touchpoints.find((candidate) => candidate.id === id);
+        if (!touchpoint || !["likely", "best"].includes(flag)) {
+          return;
+        }
+
+        const nextValue = touchpoint[flag] !== true;
+        if (nextValue) {
+          touchpoint[flag] = true;
+          enforceTouchpointFlagExclusivity(touchpoint, flag);
+        } else {
+          delete touchpoint[flag];
+        }
+
+        saveState("Saved");
+        syncTouchpointFlagClasses();
+      }
+
+      function enforceTouchpointFlagExclusivity(touchpoint, specificFlag) {
+        const flags = specificFlag ? [specificFlag] : ["likely", "best"];
+        flags.forEach((flag) => {
+          if (touchpoint[flag] !== true) {
+            return;
+          }
+
+          state.touchpoints.forEach((candidate) => {
+            if (candidate.id !== touchpoint.id && candidate.stage === touchpoint.stage && candidate[flag] === true) {
+              delete candidate[flag];
+            }
+          });
+        });
+      }
+
+      function syncTouchpointFlagClasses() {
+        state.touchpoints.forEach((touchpoint) => {
+          const element = document.querySelector(`.touchpoint[data-id="${cssEscape(touchpoint.id)}"]`);
+          if (!element) {
+            return;
+          }
+
+          element.classList.toggle("is-best", touchpoint.best === true);
+          element.classList.toggle("is-likely", touchpoint.likely === true);
+          if (touchpoint.best === true) {
+            element.dataset.best = "true";
+          } else {
+            delete element.dataset.best;
+          }
+          if (touchpoint.likely === true) {
+            element.dataset.likely = "true";
+          } else {
+            delete element.dataset.likely;
+          }
+        });
+      }
+
       function autoSizeEditor(editor) {
         editor.style.height = "auto";
         editor.style.height = `${Math.max(28, editor.scrollHeight)}px`;
       }
 
       function exportToFile() {
-        saveState("Exported");
-        const raw = readLocalStorage() || JSON.stringify(state, null, 2);
+        const raw = JSON.stringify(getNormalizedStateSnapshot(), null, 2);
         const blob = new Blob([raw], { type: "application/json" });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        link.download = "developer-journey-map.json";
+        link.download = getExportFilename("json");
         document.body.appendChild(link);
         link.click();
         link.remove();
         window.setTimeout(() => URL.revokeObjectURL(url), 250);
+        setStatus("Exported");
       }
 
-      async function downloadPng() {
-        await document.fonts.ready;
+      function getNormalizedStateSnapshot() {
+        const snapshot = cloneState(state);
+        ensureQuestionIds(snapshot.questions);
+        ensureConnectionIds(snapshot.connections);
+        normalizeQuestionOrders(snapshot.questions);
+        normalizeOrders(snapshot.touchpoints);
+        normalizeConnectionOrders(snapshot.connections, snapshot.touchpoints);
+        return snapshot;
+      }
 
-        const source = document.querySelector(".app-shell");
-        document.body.classList.add("is-rendering-png");
-        setStatus("Rendering PNG");
+      async function waitForFontsReady(timeoutMs = 2500) {
+        if (!document.fonts || !document.fonts.ready) {
+          return;
+        }
 
+        let timeoutId = null;
         try {
-          await nextFrame();
-          const mapGridWidth = mapGrid.scrollWidth + 36;
-          const width = Math.ceil(Math.max(source.scrollWidth, document.documentElement.scrollWidth, mapGridWidth));
-          const height = Math.ceil(Math.max(source.scrollHeight, document.documentElement.scrollHeight));
-          const canvas = renderJourneyMapCanvas(source, width, height);
-          const pngBlob = await canvasToBlob(canvas);
-          triggerDownload(pngBlob, "developer-journey-map.png");
-          setStatus("PNG downloaded");
-        } catch (error) {
-          setStatus("PNG failed");
+          await Promise.race([
+            document.fonts.ready.catch(() => undefined),
+            new Promise((resolve) => {
+              timeoutId = window.setTimeout(resolve, timeoutMs);
+            })
+          ]);
         } finally {
-          document.body.classList.remove("is-rendering-png");
+          window.clearTimeout(timeoutId);
         }
       }
 
-      function renderJourneyMapCanvas(root, width, height) {
+      async function downloadPng() {
+        await downloadExportArtifact("png");
+      }
+
+      async function downloadSvg() {
+        await downloadExportArtifact("svg");
+      }
+
+      async function downloadPdf() {
+        setStatus("Preparing PDF");
+
+        try {
+          const artifact = await createPdfPrintArtifact();
+          printPdfArtifact(artifact);
+          setStatus("PDF print opened");
+        } catch (error) {
+          console.error(error);
+          setStatus("PDF failed");
+        }
+      }
+
+      async function downloadExportArtifact(format) {
+        const label = format.toUpperCase();
+        setStatus(`Rendering ${label}`);
+
+        try {
+          const artifact = await createExportArtifact(format);
+          triggerDownload(artifact.blob, artifact.filename);
+          setStatus(`${label} downloaded`);
+        } catch (error) {
+          console.error(error);
+          setStatus(`${label} failed`);
+        }
+      }
+
+      async function createExportArtifact(format) {
+        const normalizedFormat = String(format || "").toLowerCase();
+        const source = document.querySelector(".app-shell");
+        await waitForFontsReady();
+
+        document.body.classList.add("is-rendering-export");
+        try {
+          await nextFrame();
+          const { width, height } = getExportSize(source);
+          const renderVisibility = getExportRenderVisibility();
+          let blob;
+          let filename;
+          let pixelHash = null;
+          let outputWidth = width;
+          let outputHeight = height;
+
+          if (normalizedFormat === "png") {
+            const canvas = renderJourneyMapCanvas(source, width, height, PNG_EXPORT_SCALE);
+            blob = await canvasToBlob(canvas);
+            filename = getExportFilename("png");
+            outputWidth = canvas.width;
+            outputHeight = canvas.height;
+            pixelHash = getCanvasRgb(canvas).hash;
+          } else if (normalizedFormat === "svg") {
+            const svg = createVectorSvg(source, width, height);
+            blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
+            filename = getExportFilename("svg");
+          } else {
+            throw new Error(`Unsupported export format: ${format}`);
+          }
+
+          const summary = {
+            format: normalizedFormat,
+            filename,
+            width: outputWidth,
+            height: outputHeight,
+            logicalWidth: width,
+            logicalHeight: height,
+            scale: normalizedFormat === "png" ? PNG_EXPORT_SCALE : 1,
+            type: blob.type,
+            size: blob.size,
+            pixelHash,
+            vector: normalizedFormat === "svg",
+            renderVisibility
+          };
+          window.__developerJourneyMapLastExport = summary;
+
+          return {
+            ...summary,
+            blob
+          };
+        } finally {
+          document.body.classList.remove("is-rendering-export");
+        }
+      }
+
+      async function createExportArtifactSummary(format) {
+        if (String(format || "").toLowerCase() === "pdf") {
+          const artifact = await createPdfPrintArtifact();
+          const htmlBytes = new TextEncoder().encode(artifact.html);
+          return {
+            format: artifact.format,
+            filename: artifact.filename,
+            width: artifact.width,
+            height: artifact.height,
+            logicalWidth: artifact.logicalWidth,
+            logicalHeight: artifact.logicalHeight,
+            scale: artifact.scale,
+            vector: artifact.vector,
+            type: artifact.type,
+            size: artifact.size,
+            byteHash: hashBytes(htmlBytes),
+            pixelHash: null,
+            renderVisibility: artifact.renderVisibility,
+            printMode: artifact.printMode,
+            sourceFormat: artifact.sourceFormat,
+            imageCount: artifact.imageCount,
+            pathCount: artifact.pathCount,
+            textCount: artifact.textCount
+          };
+        }
+
+        const artifact = await createExportArtifact(format);
+        const bytes = new Uint8Array(await artifact.blob.arrayBuffer());
+        const summary = {
+          format: artifact.format,
+          filename: artifact.filename,
+          width: artifact.width,
+          height: artifact.height,
+          logicalWidth: artifact.logicalWidth,
+          logicalHeight: artifact.logicalHeight,
+          scale: artifact.scale,
+          vector: artifact.vector,
+          type: artifact.type,
+          size: artifact.size,
+          byteHash: hashBytes(bytes),
+          pixelHash: artifact.pixelHash,
+          renderVisibility: artifact.renderVisibility
+        };
+
+        if (artifact.format === "svg") {
+          const text = new TextDecoder().decode(bytes);
+          summary.imageCount = (text.match(/<image\b/g) || []).length;
+          summary.pathCount = (text.match(/<path\b/g) || []).length;
+          summary.textCount = (text.match(/<text\b/g) || []).length;
+        }
+
+        return summary;
+      }
+
+      async function createPdfPrintArtifact() {
+        const source = document.querySelector(".app-shell");
+        await waitForFontsReady();
+
+        document.body.classList.add("is-rendering-export");
+        try {
+          await nextFrame();
+          const { width, height } = getExportSize(source);
+          const renderVisibility = getExportRenderVisibility();
+          const svg = createVectorSvg(source, width, height);
+          const filename = getExportFilename("pdf");
+          const html = createPdfPrintHtml(svg, filename, width, height);
+          const summary = {
+            format: "pdf",
+            filename,
+            width,
+            height,
+            logicalWidth: width,
+            logicalHeight: height,
+            scale: 1,
+            type: "browser/svg-print",
+            size: new TextEncoder().encode(html).length,
+            pixelHash: null,
+            vector: true,
+            printMode: "browser-print",
+            sourceFormat: "svg",
+            imageCount: (svg.match(/<image\b/g) || []).length,
+            pathCount: (svg.match(/<path\b/g) || []).length,
+            textCount: (svg.match(/<text\b/g) || []).length,
+            renderVisibility
+          };
+          window.__developerJourneyMapLastExport = summary;
+
+          return {
+            ...summary,
+            html,
+            svg
+          };
+        } finally {
+          document.body.classList.remove("is-rendering-export");
+        }
+      }
+
+      function createPdfPrintHtml(svg, filename, width, height) {
+        const title = filename.replace(/\.pdf$/i, "");
+        return [
+          "<!doctype html>",
+          '<html lang="en">',
+          "<head>",
+          '<meta charset="utf-8">',
+          `<title>${escapeXmlText(title)}</title>`,
+          "<style>",
+          `@page { size: ${toSvgNumber(width)}px ${toSvgNumber(height)}px; margin: 0; }`,
+          "html, body { margin: 0; padding: 0; width: 100%; min-width: 100%; background: #fff; }",
+          `body { width: ${toSvgNumber(width)}px; height: ${toSvgNumber(height)}px; overflow: hidden; }`,
+          "svg { display: block; width: 100%; height: auto; }",
+          "@media print { html, body { print-color-adjust: exact; -webkit-print-color-adjust: exact; } }",
+          "</style>",
+          "</head>",
+          "<body>",
+          svg,
+          "</body>",
+          "</html>"
+        ].join("\n");
+      }
+
+      function printPdfArtifact(artifact) {
+        const existingFrame = document.getElementById("pdfPrintFrame");
+        if (existingFrame) {
+          existingFrame.remove();
+        }
+
+        const frame = document.createElement("iframe");
+        frame.id = "pdfPrintFrame";
+        frame.className = "pdf-print-frame";
+        frame.title = "PDF print preview";
+        frame.setAttribute("aria-hidden", "true");
+        document.body.appendChild(frame);
+
+        frame.addEventListener("load", () => {
+          const detail = {
+            filename: artifact.filename,
+            width: artifact.width,
+            height: artifact.height,
+            sourceFormat: artifact.sourceFormat,
+            printMode: artifact.printMode
+          };
+          window.__developerJourneyMapLastPdfPrint = detail;
+          window.dispatchEvent(new CustomEvent("developerJourneyMapPdfPrint", { detail }));
+
+          if (window.DEVELOPER_JOURNEY_MAP_TEST_DISABLE_PRINT) {
+            return;
+          }
+
+          const cleanupFrame = () => {
+            window.setTimeout(() => {
+              if (frame.parentElement) {
+                frame.remove();
+              }
+            }, 500);
+          };
+
+          window.addEventListener("afterprint", cleanupFrame, { once: true });
+          if (frame.contentWindow) {
+            frame.contentWindow.addEventListener("afterprint", cleanupFrame, { once: true });
+          }
+
+          setTimeout(() => {
+            frame.contentWindow.focus();
+            frame.contentWindow.print();
+            window.setTimeout(cleanupFrame, 10000);
+          }, 50);
+        }, { once: true });
+
+        frame.srcdoc = artifact.html;
+      }
+
+      function getExportFilename(extension) {
+        return `dev-journey-map-${slugifyPersona(state && state.persona)}.${extension}`;
+      }
+
+      function slugifyPersona(value) {
+        const slug = String(value || "")
+          .normalize("NFKD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "");
+        return slug || "generic-developer";
+      }
+
+      function getExportSize(source) {
+        const mapGridWidth = mapGrid.scrollWidth + 36;
+        return {
+          width: Math.ceil(Math.max(source.scrollWidth, document.documentElement.scrollWidth, mapGridWidth)),
+          height: Math.ceil(Math.max(source.scrollHeight, document.documentElement.scrollHeight))
+        };
+      }
+
+      function getExportRenderVisibility() {
+        const isHidden = (id) => {
+          const element = document.getElementById(id);
+          return !element || !isElementRenderable(element);
+        };
+
+        return {
+          exportClassActive: document.body.classList.contains("is-rendering-export"),
+          themeToggleHidden: isHidden("themeToggle"),
+          resetHidden: isHidden("resetButton"),
+          importHidden: isHidden("importButton"),
+          exportJsonHidden: isHidden("exportButton"),
+          downloadPngHidden: isHidden("downloadPngButton"),
+          downloadSvgHidden: isHidden("downloadSvgButton"),
+          downloadPdfHidden: isHidden("downloadPdfButton"),
+          statusHidden: isHidden("status"),
+          mapInfoHidden: isHidden("mapInfo"),
+          addGoalHidden: isHidden("addGoalButton"),
+          addQuestionHidden: isHidden("addQuestionButton"),
+          addInternalHidden: isHidden("addInternalButton"),
+          addExternalHidden: isHidden("addExternalButton")
+        };
+      }
+
+      function renderJourneyMapCanvas(root, width, height, scale = 1) {
         const canvas = document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
+        canvas.width = Math.ceil(width * scale);
+        canvas.height = Math.ceil(height * scale);
 
         const context = canvas.getContext("2d");
+        context.scale(scale, scale);
         drawPageBackground(context, width, height);
         const origin = root.getBoundingClientRect();
         const bounds = (element) => {
@@ -1929,6 +4391,7 @@
         drawSideLabels(context, bounds);
         drawQuestionMarkers(context, bounds);
         drawTextNodes(context, root, origin);
+        drawConnections(context, origin);
 
         return canvas;
       }
@@ -2056,6 +4519,119 @@
             lineWidth: 1.8
           });
         });
+      }
+
+      function drawConnections(context, origin) {
+        const connections = state.connections || [];
+        if (connections.length === 0) {
+          return;
+        }
+
+        const lineWidth = CONNECTION_LINE_WIDTH;
+        const offsets = getConnectionOffsets(connections, lineWidth);
+        const stroke = cssVar("--connection", "#1d5cff");
+
+        context.save();
+        context.strokeStyle = stroke;
+        context.fillStyle = stroke;
+        context.lineWidth = lineWidth;
+        context.lineCap = "round";
+        context.lineJoin = "round";
+        context.globalAlpha = 0.5;
+
+        connections.forEach((connection, index) => {
+          const start = getCanvasTouchpointEdgePoint(connection.from, "right", offsets.from.get(index) || 0, origin);
+          const end = getCanvasTouchpointEdgePoint(connection.to, "left", offsets.to.get(index) || 0, origin);
+          if (!start || !end) {
+            return;
+          }
+
+          const route = getConnectionRoute(start, end, connection.from === connection.to, CONNECTION_ARROW_LENGTH, offsets.underpass.get(index) || 0);
+          const finalVector = getRouteFinalVector(route);
+          context.beginPath();
+          drawCanvasRoute(context, route);
+          context.stroke();
+          drawCanvasArrowHead(context, finalVector.point, finalVector.angle, CONNECTION_ARROW_LENGTH);
+        });
+
+        context.restore();
+      }
+
+      function getCanvasTouchpointEdgePoint(id, side, offset, origin) {
+        const element = document.querySelector(`.touchpoint[data-id="${cssEscape(id)}"]`);
+        const touchpoint = state.touchpoints.find((candidate) => candidate.id === id);
+        if (!element) {
+          return null;
+        }
+
+        const rect = element.getBoundingClientRect();
+        return {
+          id,
+          section: touchpoint ? touchpoint.section : null,
+          stage: touchpoint ? touchpoint.stage : null,
+          stageIndex: touchpoint ? STAGE_IDS.indexOf(touchpoint.stage) : -1,
+          originRect: origin,
+          x: (side === "right" ? rect.right : rect.left) - origin.left,
+          y: rect.top - origin.top + rect.height / 2 + offset
+        };
+      }
+
+      function drawCanvasRoute(context, route) {
+        route.forEach((command) => {
+          if (command.type === "M") {
+            context.moveTo(command.x, command.y);
+            return;
+          }
+
+          if (command.type === "L") {
+            context.lineTo(command.x, command.y);
+            return;
+          }
+
+          context.bezierCurveTo(command.cp1x, command.cp1y, command.cp2x, command.cp2y, command.x, command.y);
+        });
+      }
+
+      function getRouteFinalVector(route) {
+        const command = route[route.length - 1];
+        if (!command) {
+          return {
+            point: { x: 0, y: 0 },
+            angle: 0
+          };
+        }
+
+        if (command.type === "C") {
+          return {
+            point: {
+              x: command.x,
+              y: command.y
+            },
+            angle: Math.atan2(command.y - command.cp2y, command.x - command.cp2x)
+          };
+        }
+
+        const previous = route[route.length - 2] || command;
+        return {
+          point: {
+            x: command.x,
+            y: command.y
+          },
+          angle: Math.atan2(command.y - previous.y, command.x - previous.x)
+        };
+      }
+
+      function drawCanvasArrowHead(context, point, angle, size) {
+        context.save();
+        context.translate(point.x, point.y);
+        context.rotate(angle);
+        context.beginPath();
+        context.moveTo(0, -size / 2);
+        context.lineTo(size, 0);
+        context.lineTo(0, size / 2);
+        context.closePath();
+        context.fill();
+        context.restore();
       }
 
       function drawJourneyDivider(context, bounds, width) {
@@ -2223,89 +4799,11 @@
         return text;
       }
 
-      function drawTextElement(context, element, bounds, options = {}) {
-        if (!element) {
-          return;
-        }
-
-        const rect = bounds(element);
-        const style = getComputedStyle(element);
-        const lineHeight = parseLineHeight(style);
-        applyTextStyle(context, element);
-
-        const x = options.x ?? rect.x;
-        const maxWidth = options.maxWidth ?? rect.width;
-        let y = options.y ?? rect.y;
-
-        if (options.vertical === "middle") {
-          const fontSize = parsePx(style.fontSize);
-          y = rect.y + Math.max(0, (rect.height - fontSize) / 2);
-        }
-
-        drawWrappedText(context, element.innerText || element.textContent, x, y, maxWidth, lineHeight, options.align || style.textAlign || "left");
-      }
-
-      function drawWrappedText(context, text, x, y, maxWidth, lineHeight, align) {
-        const paragraphs = String(text || "")
-          .replace(/\r\n/g, "\n")
-          .split("\n");
-        let cursorY = y;
-
-        paragraphs.forEach((paragraph, paragraphIndex) => {
-          const words = paragraph.trim().split(/\s+/).filter(Boolean);
-          const lines = [];
-
-          if (words.length === 0) {
-            lines.push("");
-          } else {
-            let line = words[0];
-            for (let index = 1; index < words.length; index += 1) {
-              const candidate = `${line} ${words[index]}`;
-              if (context.measureText(candidate).width <= maxWidth) {
-                line = candidate;
-              } else {
-                lines.push(line);
-                line = words[index];
-              }
-            }
-            lines.push(line);
-          }
-
-          lines.forEach((line) => {
-            let drawX = x;
-            if (align === "center") {
-              drawX = x + (maxWidth - context.measureText(line).width) / 2;
-            } else if (align === "right" || align === "end") {
-              drawX = x + maxWidth - context.measureText(line).width;
-            }
-            context.fillText(line, drawX, cursorY);
-            cursorY += lineHeight;
-          });
-
-          if (paragraphIndex < paragraphs.length - 1 && words.length === 0) {
-            cursorY += lineHeight;
-          }
-        });
-      }
-
       function applyTextStyle(context, element) {
         const style = getComputedStyle(element);
         context.fillStyle = style.color || "#050505";
         context.textBaseline = "top";
         context.font = `${style.fontStyle} ${style.fontVariant} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
-      }
-
-      function parseLineHeight(style) {
-        const lineHeight = parseFloat(style.lineHeight);
-        if (Number.isFinite(lineHeight)) {
-          return lineHeight;
-        }
-        return parsePx(style.fontSize) * 1.16;
-      }
-
-      function parsePx(value) {
-        const parsed = parseFloat(value);
-        return Number.isFinite(parsed) ? parsed : 16;
       }
 
       function drawRoundedRect(context, x, y, width, height, radius, options = {}) {
@@ -2332,6 +4830,352 @@
           context.stroke();
         }
         context.restore();
+      }
+
+      function createVectorSvg(root, width, height) {
+        const origin = root.getBoundingClientRect();
+        const bounds = createBoundsGetter(origin);
+        const parts = [
+          '<?xml version="1.0" encoding="UTF-8"?>',
+          `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="Developer Journey Map export">`,
+          "<defs>",
+          `<linearGradient id="export-page-bg" x1="0" y1="0" x2="0" y2="${toSvgNumber(height)}" gradientUnits="userSpaceOnUse">`,
+          `<stop offset="0" stop-color="${escapeXmlAttribute(normalizeCssColor(cssVar("--canvas-bg-start", "#ffffff"), "#ffffff"))}"/>`,
+          `<stop offset="1" stop-color="${escapeXmlAttribute(normalizeCssColor(cssVar("--canvas-bg-end", "#f7f7f4"), "#f7f7f4"))}"/>`,
+          "</linearGradient>",
+          `<linearGradient id="export-rail-bg" x1="0" y1="0" x2="1" y2="0">`,
+          `<stop offset="0" stop-color="${escapeXmlAttribute(normalizeCssColor(cssVar("--rail", "#bfc0c2"), "#bfc0c2"))}"/>`,
+          `<stop offset="1" stop-color="${escapeXmlAttribute(normalizeCssColor(cssVar("--rail-dark", "#aeb0b3"), "#aeb0b3"))}"/>`,
+          "</linearGradient>",
+          `<marker id="exportArrowHead" viewBox="0 0 6 6" refX="0" refY="3" markerWidth="6" markerHeight="6" markerUnits="userSpaceOnUse" orient="auto">`,
+          `<path d="M 0 0 L 6 3 L 0 6 z" fill="${escapeXmlAttribute(normalizeCssColor(cssVar("--connection", "#1d5cff"), "#1d5cff"))}"/>`,
+          "</marker>",
+          "</defs>",
+          `<rect x="0" y="0" width="${toSvgNumber(width)}" height="${toSvgNumber(height)}" fill="url(#export-page-bg)"/>`
+        ];
+
+        appendSvgTexture(parts, width, height);
+        appendSvgSideRail(parts, bounds);
+        appendSvgToolbar(parts, bounds);
+        appendSvgStagePills(parts, bounds);
+        appendSvgTouchpoints(parts, bounds);
+        appendSvgJourneyDivider(parts, bounds, width);
+        appendSvgSideLabels(parts, bounds);
+        appendSvgQuestionMarkers(parts, bounds);
+        appendSvgTextNodes(parts, root, origin);
+        appendSvgConnections(parts, origin);
+
+        parts.push("</svg>");
+        return parts.join("\n");
+      }
+
+      function createBoundsGetter(origin) {
+        return (element) => {
+          const rect = element.getBoundingClientRect();
+          return {
+            x: rect.left - origin.left,
+            y: rect.top - origin.top,
+            width: rect.width,
+            height: rect.height
+          };
+        };
+      }
+
+      function appendSvgTexture(parts, width, height) {
+        const stroke = normalizeCssColor(cssVar("--texture-line", "rgba(0, 0, 0, 0.018)"), "rgba(0,0,0,0.018)");
+        for (let y = 0; y < height; y += 5) {
+          parts.push(`<line x1="0" y1="${toSvgNumber(y + 0.5)}" x2="${toSvgNumber(width)}" y2="${toSvgNumber(y + 0.5)}" stroke="${escapeXmlAttribute(stroke)}" stroke-width="1"/>`);
+        }
+      }
+
+      function appendSvgSideRail(parts, bounds) {
+        const rail = bounds(document.getElementById("deleteZone"));
+        parts.push(svgRoundedRect(rail.x, rail.y, rail.width, rail.height, 10, {
+          fill: "url(#export-rail-bg)",
+          stroke: cssVar("--line", "#050505"),
+          lineWidth: 3
+        }));
+      }
+
+      function appendSvgToolbar(parts, bounds) {
+        document.querySelectorAll(".control-button").forEach((button) => {
+          if (!isElementRenderable(button)) {
+            return;
+          }
+
+          const rect = bounds(button);
+          const style = getComputedStyle(button);
+          parts.push(svgRoundedRect(rect.x, rect.y + 2, rect.width, rect.height, 8, {
+            fill: style.borderTopColor || cssVar("--line", "#050505")
+          }));
+          parts.push(svgRoundedRect(rect.x, rect.y, rect.width, rect.height, 8, {
+            fill: style.backgroundColor || cssVar("--control-surface", "#ffffff"),
+            stroke: style.borderTopColor || cssVar("--line", "#050505"),
+            lineWidth: 2
+          }));
+        });
+      }
+
+      function appendSvgStagePills(parts, bounds) {
+        document.querySelectorAll(".stage-pill").forEach((pill) => {
+          const rect = bounds(pill);
+          const notch = 48;
+          const style = getComputedStyle(pill);
+          const d = [
+            `M ${toSvgNumber(rect.x + 8)} ${toSvgNumber(rect.y)}`,
+            `L ${toSvgNumber(rect.x + rect.width - notch)} ${toSvgNumber(rect.y)}`,
+            `L ${toSvgNumber(rect.x + rect.width)} ${toSvgNumber(rect.y + rect.height / 2)}`,
+            `L ${toSvgNumber(rect.x + rect.width - notch)} ${toSvgNumber(rect.y + rect.height)}`,
+            `L ${toSvgNumber(rect.x + 8)} ${toSvgNumber(rect.y + rect.height)}`,
+            `Q ${toSvgNumber(rect.x)} ${toSvgNumber(rect.y + rect.height)} ${toSvgNumber(rect.x)} ${toSvgNumber(rect.y + rect.height - 8)}`,
+            `L ${toSvgNumber(rect.x)} ${toSvgNumber(rect.y + 8)}`,
+            `Q ${toSvgNumber(rect.x)} ${toSvgNumber(rect.y)} ${toSvgNumber(rect.x + 8)} ${toSvgNumber(rect.y)}`,
+            "Z"
+          ].join(" ");
+          parts.push(`<path d="${d}" fill="${escapeXmlAttribute(normalizeCssColor(style.backgroundColor || cssVar("--stage-fill", "#000000"), "#000000"))}"/>`);
+        });
+      }
+
+      function appendSvgTouchpoints(parts, bounds) {
+        document.querySelectorAll(".touchpoint").forEach((touchpoint) => {
+          const rect = bounds(touchpoint);
+          const style = getComputedStyle(touchpoint);
+          let fill = style.backgroundColor || cssVar("--touchpoint-bg", "#ffffff");
+          if (touchpoint.classList.contains("flash-added")) {
+            fill = "#d7ecff";
+          } else if (touchpoint.classList.contains("flash-moved")) {
+            fill = "#d9f6dc";
+          }
+
+          parts.push(svgRoundedRect(rect.x, rect.y, rect.width, rect.height, 8, {
+            fill,
+            stroke: style.borderTopColor || cssVar("--line", "#050505"),
+            lineWidth: 1.8
+          }));
+        });
+      }
+
+      function appendSvgSideLabels(parts, bounds) {
+        document.querySelectorAll(".add-button").forEach((button) => {
+          if (!isElementRenderable(button)) {
+            return;
+          }
+
+          const rect = bounds(button);
+          const style = getComputedStyle(button);
+          parts.push(svgRoundedRect(rect.x, rect.y + 2, rect.width, rect.height, rect.width / 2, {
+            fill: style.borderTopColor || cssVar("--line", "#050505")
+          }));
+          parts.push(svgRoundedRect(rect.x, rect.y, rect.width, rect.height, rect.width / 2, {
+            fill: style.backgroundColor || cssVar("--control-surface", "#ffffff"),
+            stroke: style.borderTopColor || cssVar("--line", "#050505"),
+            lineWidth: 2
+          }));
+        });
+      }
+
+      function appendSvgJourneyDivider(parts, bounds, width) {
+        const divider = bounds(document.querySelector(".journey-divider"));
+        const y = divider.y + 12;
+        const line = normalizeCssColor(cssVar("--line", "#050505"), "#050505");
+        parts.push(`<line x1="40" y1="${toSvgNumber(y)}" x2="${toSvgNumber(width - 78)}" y2="${toSvgNumber(y)}" stroke="${escapeXmlAttribute(line)}" stroke-width="5" stroke-linecap="round" stroke-dasharray="18 10"/>`);
+        parts.push(`<path d="M ${toSvgNumber(width - 50)} ${toSvgNumber(y - 14)} L ${toSvgNumber(width)} ${toSvgNumber(y)} L ${toSvgNumber(width - 50)} ${toSvgNumber(y + 14)} Z" fill="${escapeXmlAttribute(line)}"/>`);
+      }
+
+      function appendSvgQuestionMarkers(parts, bounds) {
+        document.querySelectorAll(".question-cell").forEach((cell) => {
+          cell.querySelectorAll("li").forEach((item, index) => {
+            const rect = bounds(item);
+            const style = getComputedStyle(item);
+            parts.push(svgText(`${index + 1}.`, rect.x - 30, rect.y + 1, {
+              fill: style.color || cssVar("--ink", "#050505"),
+              fontFamily: style.fontFamily,
+              fontSize: style.fontSize,
+              fontWeight: "900",
+              fontStyle: style.fontStyle
+            }));
+          });
+        });
+      }
+
+      function appendSvgTextNodes(parts, root, origin) {
+        const range = document.createRange();
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+          acceptNode(node) {
+            if (!node.nodeValue || node.nodeValue.trim().length === 0) {
+              return NodeFilter.FILTER_REJECT;
+            }
+
+            const element = node.parentElement;
+            if (!element || element.closest("script, style, .visually-hidden")) {
+              return NodeFilter.FILTER_REJECT;
+            }
+
+            if (!isElementRenderable(element)) {
+              return NodeFilter.FILTER_REJECT;
+            }
+
+            return NodeFilter.FILTER_ACCEPT;
+          }
+        });
+
+        let node = walker.nextNode();
+        while (node) {
+          const element = node.parentElement;
+          const style = getComputedStyle(element);
+          const pattern = /\S+/g;
+          let match = pattern.exec(node.nodeValue);
+          while (match) {
+            appendSvgTextRun(parts, node, match.index, match.index + match[0].length, style, origin, range);
+            match = pattern.exec(node.nodeValue);
+          }
+          node = walker.nextNode();
+        }
+      }
+
+      function appendSvgTextRun(parts, node, startOffset, endOffset, style, origin, range) {
+        range.setStart(node, startOffset);
+        range.setEnd(node, endOffset);
+        const rects = getVisibleClientRects(range);
+        if (rects.length === 0) {
+          return;
+        }
+
+        if (rects.length === 1) {
+          const rect = rects[0];
+          const text = transformText(node.nodeValue.slice(startOffset, endOffset), style.textTransform);
+          parts.push(svgText(text, rect.left - origin.left, rect.top - origin.top, {
+            fill: style.color,
+            fontFamily: style.fontFamily,
+            fontSize: style.fontSize,
+            fontWeight: style.fontWeight,
+            fontStyle: style.fontStyle
+          }));
+          return;
+        }
+
+        const fragments = splitTextRunByClientRects(node, startOffset, endOffset, rects, range);
+        fragments.forEach((fragment) => {
+          const text = transformText(fragment.text, style.textTransform);
+          parts.push(svgText(text, fragment.rect.left - origin.left, fragment.rect.top - origin.top, {
+            fill: style.color,
+            fontFamily: style.fontFamily,
+            fontSize: style.fontSize,
+            fontWeight: style.fontWeight,
+            fontStyle: style.fontStyle
+          }));
+        });
+      }
+
+      function appendSvgConnections(parts, origin) {
+        const connections = state.connections || [];
+        if (connections.length === 0) {
+          return;
+        }
+
+        const offsets = getConnectionOffsets(connections, CONNECTION_LINE_WIDTH);
+        const stroke = normalizeCssColor(cssVar("--connection", "#1d5cff"), "#1d5cff");
+        connections.forEach((connection, index) => {
+          const start = getCanvasTouchpointEdgePoint(connection.from, "right", offsets.from.get(index) || 0, origin);
+          const end = getCanvasTouchpointEdgePoint(connection.to, "left", offsets.to.get(index) || 0, origin);
+          if (!start || !end) {
+            return;
+          }
+
+          const d = connectionPathData(start, end, connection.from === connection.to, CONNECTION_ARROW_LENGTH, offsets.underpass.get(index) || 0);
+          parts.push(`<path d="${escapeXmlAttribute(d)}" fill="none" stroke="${escapeXmlAttribute(stroke)}" stroke-width="${CONNECTION_LINE_WIDTH}" stroke-linecap="round" stroke-linejoin="round" opacity="0.5" marker-end="url(#exportArrowHead)"/>`);
+        });
+      }
+
+      function svgRoundedRect(x, y, width, height, radius, options = {}) {
+        const safeRadius = Math.min(radius, width / 2, height / 2);
+        const attrs = [
+          `x="${toSvgNumber(x)}"`,
+          `y="${toSvgNumber(y)}"`,
+          `width="${toSvgNumber(width)}"`,
+          `height="${toSvgNumber(height)}"`,
+          `rx="${toSvgNumber(safeRadius)}"`,
+          `ry="${toSvgNumber(safeRadius)}"`
+        ];
+        if (options.fill) {
+          const fill = String(options.fill).startsWith("url(") ? options.fill : normalizeCssColor(options.fill, "#ffffff");
+          attrs.push(`fill="${escapeXmlAttribute(fill)}"`);
+        } else {
+          attrs.push('fill="none"');
+        }
+        if (options.stroke) {
+          attrs.push(`stroke="${escapeXmlAttribute(normalizeCssColor(options.stroke, "#050505"))}"`);
+          attrs.push(`stroke-width="${toSvgNumber(options.lineWidth || 1)}"`);
+        }
+        return `<rect ${attrs.join(" ")}/>`;
+      }
+
+      function svgText(text, x, y, style) {
+        return `<text x="${toSvgNumber(x)}" y="${toSvgNumber(y)}" dominant-baseline="text-before-edge" font-family="${escapeXmlAttribute(style.fontFamily || cssVar("--sans", "sans-serif"))}" font-size="${escapeXmlAttribute(style.fontSize || "16px")}" font-weight="${escapeXmlAttribute(style.fontWeight || "400")}" font-style="${escapeXmlAttribute(style.fontStyle || "normal")}" fill="${escapeXmlAttribute(normalizeCssColor(style.fill || cssVar("--ink", "#050505"), "#050505"))}">${escapeXmlText(text)}</text>`;
+      }
+
+      function toSvgNumber(value) {
+        return String(Math.round(Number(value || 0) * 100) / 100);
+      }
+
+      function getCanvasRgb(canvas) {
+        const context = canvas.getContext("2d");
+        const rgba = context.getImageData(0, 0, canvas.width, canvas.height).data;
+        const rgb = new Uint8Array(canvas.width * canvas.height * 3);
+        let targetIndex = 0;
+
+        for (let sourceIndex = 0; sourceIndex < rgba.length; sourceIndex += 4) {
+          const alpha = rgba[sourceIndex + 3];
+          if (alpha === 255) {
+            rgb[targetIndex] = rgba[sourceIndex];
+            rgb[targetIndex + 1] = rgba[sourceIndex + 1];
+            rgb[targetIndex + 2] = rgba[sourceIndex + 2];
+          } else {
+            const opacity = alpha / 255;
+            rgb[targetIndex] = Math.round(rgba[sourceIndex] * opacity + 255 * (1 - opacity));
+            rgb[targetIndex + 1] = Math.round(rgba[sourceIndex + 1] * opacity + 255 * (1 - opacity));
+            rgb[targetIndex + 2] = Math.round(rgba[sourceIndex + 2] * opacity + 255 * (1 - opacity));
+          }
+          targetIndex += 3;
+        }
+
+        return {
+          bytes: rgb,
+          hash: hashBytes(rgb)
+        };
+      }
+
+      function hashBytes(bytes) {
+        let hash = 2166136261;
+        for (let index = 0; index < bytes.length; index += 1) {
+          hash ^= bytes[index];
+          hash = Math.imul(hash, 16777619);
+        }
+        return (hash >>> 0).toString(16).padStart(8, "0");
+      }
+
+      function normalizeCssColor(value, fallback) {
+        const canvas = normalizeCssColor.canvas || document.createElement("canvas");
+        normalizeCssColor.canvas = canvas;
+        const context = canvas.getContext("2d");
+        context.fillStyle = fallback || "#000000";
+        context.fillStyle = value || fallback || "#000000";
+        return context.fillStyle || fallback || "#000000";
+      }
+
+      function escapeXmlText(value) {
+        return String(value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+
+      function escapeXmlAttribute(value) {
+        return String(value)
+          .replace(/&/g, "&amp;")
+          .replace(/"/g, "&quot;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
       }
 
       function canvasToBlob(canvas) {
@@ -2417,10 +5261,13 @@
         renderTouchpoints();
       }
 
-      function setStatus(message) {
+      function setStatus(message, options = {}) {
         window.clearTimeout(statusTimer);
         statusEl.textContent = message;
-        if (message !== "Ready") {
+        const shouldAutoReset = options.transient !== false &&
+          message !== "Ready" &&
+          !/(failed|blocked|invalid|canceled|cancelled|reset|already exists)/i.test(String(message));
+        if (shouldAutoReset) {
           statusTimer = window.setTimeout(() => {
             statusEl.textContent = "Saved";
           }, 1800);

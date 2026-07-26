@@ -4,7 +4,7 @@ description: Constructs a developer journey map for a selected developer persona
 license: MIT
 metadata:
   author: bguiz
-  version: "0.0.1"
+  version: "0.1.0"
   activates_on: []
   uses: []
 ---
